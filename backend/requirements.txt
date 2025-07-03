@@ -1,2 +1,3 @@
 fastapi==0.115.14
 SQLAlchemy==2.0.41
+passlib==1.7.4

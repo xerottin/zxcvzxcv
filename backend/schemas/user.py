@@ -1,13 +1,22 @@
+from typing import Optional
+
 from pydantic import BaseModel, EmailStr
 
+class UserBase(BaseModel):
+    username: Optional[str] = None
 
-
-
-class User(BaseModel):
+class UserRead(BaseModel):
+    id: int
     username: str
-
-class UserInDB(User):
-    password: str
     email: EmailStr
-    phone: str
-    is_verified: bool
+    class Config:
+        orm_mode = True
+class UserInDB(UserBase):
+    email: EmailStr
+    password: str
+    phone: Optional[str] = None
+    is_verified: Optional[bool] = False
+
+class UserCreate(UserBase):
+    email: EmailStr
+    password: str
