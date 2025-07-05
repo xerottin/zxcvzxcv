@@ -7,6 +7,10 @@ class Settings(BaseSettings):
     POSTGRES_HOST: str = "localhost"
     POSTGRES_PORT: str = "5432"
 
+    SECRET_KEY: str = "supersecret"
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+
     class Config:
         env_file = ".env"
 
@@ -18,3 +22,5 @@ class Settings(BaseSettings):
         )
 
 settings = Settings()
+
+

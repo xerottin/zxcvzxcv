@@ -1,8 +1,15 @@
+import enum
+
 from sqlalchemy import Boolean, Column, DateTime, Integer
 from sqlalchemy.sql import func
 
 from db.base import Base
 
+class UserRole(enum.Enum):
+    admin = "admin"
+    company = "company"
+    cafeteria = "cafeteria"
+    user = "user"
 
 class BaseModel(Base):
     __abstract__ = True
@@ -10,3 +17,4 @@ class BaseModel(Base):
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
     is_active = Column(Boolean, default=True)
+
