@@ -14,34 +14,39 @@ router = APIRouter()
 
 @router.post("/", response_model=UserRead, status_code=status.HTTP_201_CREATED)
 async def create_user_view(
-    user: UserCreate,
-    db: AsyncSession = Depends(get_pg_db)
+        user: UserCreate,
+        db: AsyncSession = Depends(get_pg_db)
 ):
     try:
         return await create_user(db, user)
     except HTTPException as e:
         raise e
 
+
 @router.get("/me", response_model=UserRead)
 async def get_me(current_user: User = Depends(get_current_user)):
     return current_user
+
 
 @router.get("/", response_model=List[UserInDB])
 async def list_users(db: AsyncSession = Depends(get_pg_db), current_user: User = Depends(get_current_user)):
     return await get_users(db)
 
+
 @router.get("/{user_id}", response_model=UserInDB)
 async def get_user_view(db: AsyncSession = Depends(get_pg_db), current_user: User = Depends(get_current_user)):
     return await get_user(db, current_user.id)
 
+
 @router.put("/{user_id}", response_model=UserInDB)
 async def update_user_view(
-    user: UserUpdate,
-    db: AsyncSession = Depends(get_pg_db),
-    current_user: User = Depends(get_current_user)
+        user: UserUpdate,
+        db: AsyncSession = Depends(get_pg_db),
+        current_user: User = Depends(get_current_user)
 ):
     updated_user = await update_user(db, current_user.id, user)
     return UserInDB.from_orm(updated_user)
+
 
 @router.delete("/{user_id}", status_code=204)
 async def delete_user_view(db: AsyncSession = Depends(get_pg_db), current_user: User = Depends(get_current_user)):
