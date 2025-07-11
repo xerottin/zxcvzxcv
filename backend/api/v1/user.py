@@ -13,7 +13,7 @@ router = APIRouter()
 
 
 @router.post("/", response_model=UserRead, status_code=status.HTTP_201_CREATED)
-async def create_user_view(
+async def create_user_(
         user: UserCreate,
         db: AsyncSession = Depends(get_pg_db)
 ):
