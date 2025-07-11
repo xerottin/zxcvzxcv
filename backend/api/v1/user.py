@@ -1,13 +1,14 @@
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, status, Security
+from fastapi import APIRouter, Depends, HTTPException, status, Security, Path
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from crud.user import get_users, get_user, update_user, delete_user, create_user
-from dependencies.auth import get_current_user, check_create_permission
+from dependencies.auth import get_current_user, check_assign_permission
 from models import User
-from schemas.user import UserCreate, UserRead, UserInDB, UserUpdate
+from schemas.user import UserCreate, UserRead, UserInDB, UserUpdate, UserRoleUpdate
 from db.session import get_pg_db
+from services.user import update_user_role
 
 router = APIRouter()
 
@@ -43,6 +44,25 @@ async def update_user_view(
 ):
     updated_user = await update_user(db, current_user.id, user)
     return UserInDB.from_orm(updated_user)
+
+@router.patch(
+    "/{user_id}/role",
+    response_model=UserRead,
+    status_code=status.HTTP_200_OK,
+)
+async def patch_user_role(
+    user_id: int = Path(..., ge=1),
+    payload: UserRoleUpdate = Depends(),
+    db: AsyncSession = Depends(get_pg_db),
+    current_user: User = Depends(get_current_user),
+):
+    check_assign_permission(payload.role, current_user)
+    """
+    Сменить роль пользователя.
+    Тело: {"role": "cafeteria"}.
+    Права проверяются через check_assign_permission.
+    """
+    return await update_user_role(db, user_id, payload.role)
 
 
 @router.delete("/{user_id}", status_code=204)

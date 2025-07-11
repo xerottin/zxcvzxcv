@@ -42,3 +42,5 @@ class UserUpdate(UserBase):
     phone: Optional[str] = None
     is_verified: Optional[bool] = False
 
+class UserRoleUpdate(UserBase):
+    role: UserRole
