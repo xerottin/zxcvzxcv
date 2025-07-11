@@ -1,10 +1,10 @@
-from typing import List
+from typing import List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Security
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from crud.user import get_users, get_user, update_user, delete_user, create_user
-from dependencies.auth import get_current_user
+from dependencies.auth import get_current_user, check_create_permission
 from models import User
 from schemas.user import UserCreate, UserRead, UserInDB, UserUpdate
 from db.session import get_pg_db
@@ -13,14 +13,11 @@ router = APIRouter()
 
 
 @router.post("/", response_model=UserRead, status_code=status.HTTP_201_CREATED)
-async def create_user_(
-        user: UserCreate,
-        db: AsyncSession = Depends(get_pg_db)
+async def create_user_endpoint(
+    payload: UserCreate,
+    db: AsyncSession = Depends(get_pg_db),
 ):
-    try:
-        return await create_user(db, user)
-    except HTTPException as e:
-        raise e
+    return await create_user(db, payload)
 
 
 @router.get("/me", response_model=UserRead)

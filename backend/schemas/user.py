@@ -33,9 +33,11 @@ class UserInDB(UserBase):
 class UserCreate(UserBase):
     email: EmailStr
     password: str
+    role: UserRole = UserRole.user
 
 
 class UserUpdate(UserBase):
+    role: UserRole = UserRole.user
     password: Optional[str] = None
     phone: Optional[str] = None
     is_verified: Optional[bool] = False

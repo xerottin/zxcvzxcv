@@ -1,29 +1,39 @@
+import re
+from uuid import uuid4
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from fastapi import HTTPException, status
+from fastapi import HTTPException
 
 from models import User
-from models.base import UserRole
 from schemas.user import UserCreate, UserUpdate
 from utils.security import get_password_hash
 
-async def create_user(db: AsyncSession, user: UserCreate) -> User:
-    result = await db.execute(select(User).where(User.email == user.email))
-    existing_user = result.scalar_one_or_none()
+async def create_user(db: AsyncSession, data: UserCreate) -> User:
+    if await db.scalar(select(User).where(User.email == data.email)):
+        raise HTTPException(status_code=409, detail="Email already registered")
 
-    if existing_user:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already registered")
+    if not data.username:
+        base = re.split(r"@+", data.email)[0]
+        base = re.sub(r"\W+", "", base) or "user"
+        username = f"{base}_{uuid4().hex[:6]}"
+    else:
+        username = data.username
 
-    new_user = User(
-        username=user.username,
-        email=user.email,
-        hashed_password=get_password_hash(user.password),
-        role=UserRole.user,
+    exists = await db.scalar(select(User).where(User.username == username))
+    if exists:
+        username = f"{username}_{uuid4().hex[:4]}"
+
+    user = User(
+        username=username,
+        email=data.email,
+        hashed_password=get_password_hash(data.password),
+        role=data.role,
     )
-    db.add(new_user)
+    db.add(user)
     await db.commit()
-    await db.refresh(new_user)
-    return new_user
+    await db.refresh(user)
+    return user
 
 async def get_users(db: AsyncSession, skip: int = 0, limit: int = 100):
     result = await db.execute(select(User).where(is_active=True).offset(skip).limit(limit))
