@@ -9,6 +9,7 @@ ASSIGN_RULES: dict[UserRole, set[UserRole]] = {
     UserRole.cafeteria: {UserRole.user}, # need add stuff
 }
 
+
 def check_assign_permission(
     new_role: UserRole,
     current: User,

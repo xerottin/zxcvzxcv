@@ -20,7 +20,6 @@ class UserRead(BaseModel):
 
 class UserInDB(UserBase):
     email: EmailStr
-    password: str
     phone: Optional[str] = None
     is_verified: Optional[bool] = False
     role: UserRole = UserRole.user
