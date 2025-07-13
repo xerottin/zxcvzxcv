@@ -61,3 +61,5 @@ async def delete_user(db: AsyncSession, user_id: int):
     await db.commit()
     await db.refresh(user)
     return {"ok": True}
+
+
