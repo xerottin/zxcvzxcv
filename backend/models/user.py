@@ -1,6 +1,6 @@
 from sqlalchemy import Column, String, Boolean, Enum
 
-from models.base import BaseModel, UserRole
+from models.base import BaseModel
 
 
 class User(BaseModel):
@@ -11,4 +11,3 @@ class User(BaseModel):
     email = Column(String, unique=True, nullable=False)
     phone = Column(String, unique=True, nullable=True)
     is_verified = Column(Boolean, nullable=True, default=False)
-    role = Column(Enum(UserRole, name="user_role"), default=UserRole.user, nullable=False)
