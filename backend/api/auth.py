@@ -11,7 +11,6 @@ from schemas.token import Token
 
 router = APIRouter(prefix="", tags=["auth"])
 
-
 @router.post("/login")
 async def login(form: OAuth2PasswordRequestForm = Depends(),
                 db: AsyncSession = Depends(get_pg_db)):
