@@ -1,13 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.session import get_pg_db
 from core.security import verify_password, create_access_token
 from models import User
+from core.security import login_for_access_token
+from schemas.token import Token
 
-router = APIRouter()
+router = APIRouter(prefix="", tags=["auth"])
 
 @router.post("/login")
 async def login(form: OAuth2PasswordRequestForm = Depends(),
@@ -19,3 +21,11 @@ async def login(form: OAuth2PasswordRequestForm = Depends(),
                             detail="Incorrect email or password")
     access_token = create_access_token({"sub": str(user.id)})
     return {"access_token": access_token, "token_type": "bearer"}
+
+
+@router.post("/token", response_model=Token)
+async def login_token(
+        form_data=Depends(),
+        db: AsyncSession = Depends(get_pg_db)
+):
+    return await login_for_access_token(form_data, db)
