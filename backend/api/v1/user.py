@@ -1,13 +1,14 @@
 from typing import List
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, Path
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from crud.user import get_users, get_user, update_user, delete_user, create_user
-from dependencies.auth import get_current_user
+from dependencies.auth import get_current_user, check_assign_permission
 from models import User
-from schemas.user import UserCreate, UserRead, UserInDB, UserUpdate
+from schemas.user import UserCreate, UserRead, UserInDB, UserUpdate, UserRoleUpdate
 from db.session import get_pg_db
+from services.user import update_user_role
 
 router = APIRouter()
 
@@ -31,8 +32,8 @@ async def list_users(db: AsyncSession = Depends(get_pg_db), current_user: User =
 
 
 @router.get("/{user_id}", response_model=UserInDB)
-async def get_user_view(user_id:int, db: AsyncSession = Depends(get_pg_db), current_user: User = Depends(get_current_user)):
-    return await get_user(db, user_id)
+async def get_user_view(db: AsyncSession = Depends(get_pg_db), current_user: User = Depends(get_current_user)):
+    return await get_user(db, current_user.id)
 
 
 @router.put("/{user_id}", response_model=UserInDB)
@@ -44,7 +45,22 @@ async def update_user_view(
     updated_user = await update_user(db, current_user.id, user)
     return UserInDB.from_orm(updated_user)
 
+@router.patch(
+    "/{user_id}/role",
+    response_model=UserRead,
+    status_code=status.HTTP_200_OK,
+)
+async def patch_user_role(
+    user_id: int = Path(..., ge=1),
+    payload: UserRoleUpdate = Depends(),
+    db: AsyncSession = Depends(get_pg_db),
+    current_user: User = Depends(get_current_user),
+):
+    check_assign_permission(payload.role, current_user)
+    return await update_user_role(db, user_id, payload.role)
+
+
 @router.delete("/{user_id}", status_code=204)
 async def delete_user_view(db: AsyncSession = Depends(get_pg_db), current_user: User = Depends(get_current_user)):
     await delete_user(db, current_user.id)
-    return None
+    return {"success" : True}

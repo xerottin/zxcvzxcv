@@ -5,6 +5,12 @@ from sqlalchemy.sql import func
 
 from db.base import Base
 
+class UserRole(enum.Enum):
+    admin = "admin"
+    company = "company"
+    branche = "branche"
+    user = "user"
+
 class BaseModel(Base):
     __abstract__ = True
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)

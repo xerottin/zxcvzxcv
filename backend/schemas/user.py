@@ -2,6 +2,7 @@ from typing import Optional
 
 from pydantic import BaseModel, EmailStr
 
+from models.base import UserRole
 
 
 class UserBase(BaseModel):
@@ -19,8 +20,10 @@ class UserRead(BaseModel):
 
 class UserInDB(UserBase):
     email: EmailStr
+    password: str
     phone: Optional[str] = None
     is_verified: Optional[bool] = False
+    role: UserRole = UserRole.user
 
     class Config:
         orm_mode = True
@@ -30,9 +33,14 @@ class UserInDB(UserBase):
 class UserCreate(UserBase):
     email: EmailStr
     password: str
+    role: UserRole = UserRole.user
 
 
 class UserUpdate(UserBase):
+    role: UserRole = UserRole.user
     password: Optional[str] = None
     phone: Optional[str] = None
     is_verified: Optional[bool] = False
+
+class UserRoleUpdate(UserBase):
+    role: UserRole

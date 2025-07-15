@@ -7,8 +7,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from db.session import get_pg_db
+from dependencies.permission import ASSIGN_RULES
 from models import User
 from core.security import decode_access_token
+from models.base import UserRole
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
@@ -38,4 +40,13 @@ async def get_current_user(
     return user
 
 
-
+def check_assign_permission(
+    target_role: UserRole,
+    current: Optional[User] = Security(get_current_user, scopes=[]),
+):
+    if current is None:
+        raise HTTPException(status_code=401, detail="Authentication required")
+    allowed = ASSIGN_RULES.get(current.role, set())
+    if target_role not in allowed:
+        raise HTTPException(status_code=403, detail="You cannot assign this role")
+    return current
