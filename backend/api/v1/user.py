@@ -9,14 +9,13 @@ from models import User
 from schemas.user import UserCreate, UserRead, UserInDB, UserUpdate, UserRoleUpdate
 from db.session import get_pg_db
 
-
 router = APIRouter()
 
 
 @router.post("/create", response_model=UserRead, status_code=status.HTTP_201_CREATED)
 async def create_user_endpoint(
-    payload: UserCreate,
-    db: AsyncSession = Depends(get_pg_db),
+        payload: UserCreate,
+        db: AsyncSession = Depends(get_pg_db),
 ):
     return await create_user(db, payload)
 
@@ -44,11 +43,12 @@ async def get_user_endpoint(
 async def update_user_endpoint(
         user_id: int,
         user: UserUpdate,
+        current_user: User = Depends(get_current_user),
         db: AsyncSession = Depends(get_pg_db),
-        current_user: User = Depends(get_current_user)
 ):
     updated_user = await update_user(db, user_id, user)
     return UserInDB.from_orm(updated_user)
+
 
 @router.patch(
     "/role/{user_id}",
@@ -56,10 +56,10 @@ async def update_user_endpoint(
     status_code=status.HTTP_200_OK,
 )
 async def patch_user_role(
-    user_id: int = Path(..., ge=1),
-    payload: UserRoleUpdate = Depends(),
-    db: AsyncSession = Depends(get_pg_db),
-    current_user: User = Depends(get_current_user),
+        user_id: int = Path(..., ge=1),
+        payload: UserRoleUpdate = Depends(),
+        current_user: User = Depends(get_current_user),
+        db: AsyncSession = Depends(get_pg_db),
 ):
     check_assign_permission(payload.role, current_user)
     return await update_user_role(db, user_id, payload.role)
@@ -68,7 +68,7 @@ async def patch_user_role(
 @router.delete("/delete/{user_id}", status_code=204)
 async def delete_user_endpoint(
         user_id: int,
+        current_user: User = Depends(get_current_user),
         db: AsyncSession = Depends(get_pg_db),
-        current_user: User = Depends(get_current_user)
 ):
     await delete_user(db, user_id)
