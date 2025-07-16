@@ -1,12 +1,12 @@
 from fastapi import HTTPException, status
 
 from models import User
-from models.base import UserRole
+from models.user import UserRole
 
 ASSIGN_RULES: dict[UserRole, set[UserRole]] = {
     UserRole.admin:     set(UserRole),
-    UserRole.company:   {UserRole.cafeteria, UserRole.user},
-    UserRole.cafeteria: {UserRole.user}, # need add stuff
+    UserRole.company:   {UserRole.branche, UserRole.user},
+    UserRole.branche: {UserRole.user}, # need add stuff
 }
 
 def check_assign_permission(

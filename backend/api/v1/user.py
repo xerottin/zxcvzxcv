@@ -27,17 +27,19 @@ async def get_me(current_user: User = Depends(get_current_user)):
 
 
 @router.get("/", response_model=List[UserInDB])
-async def list_users(db: AsyncSession = Depends(get_pg_db), current_user: User = Depends(get_current_user)):
+async def list_users(db: AsyncSession = Depends(get_pg_db)
+                     # , current_user: User = Depends(get_current_user)
+                     ):
     return await get_users(db)
 
 
-@router.get("/{user_id}", response_model=UserInDB)
-async def get_user_view(db: AsyncSession = Depends(get_pg_db), current_user: User = Depends(get_current_user)):
+@router.get("/", response_model=UserInDB)
+async def get_user_endpoint(db: AsyncSession = Depends(get_pg_db), current_user: User = Depends(get_current_user)):
     return await get_user(db, current_user.id)
 
 
-@router.put("/{user_id}", response_model=UserInDB)
-async def update_user_view(
+@router.put("/", response_model=UserInDB)
+async def update_user_endpoint(
         user: UserUpdate,
         db: AsyncSession = Depends(get_pg_db),
         current_user: User = Depends(get_current_user)
@@ -61,6 +63,6 @@ async def patch_user_role(
 
 
 @router.delete("/{user_id}", status_code=204)
-async def delete_user_view(db: AsyncSession = Depends(get_pg_db), current_user: User = Depends(get_current_user)):
+async def delete_user_endpoint(db: AsyncSession = Depends(get_pg_db), current_user: User = Depends(get_current_user)):
     await delete_user(db, current_user.id)
     return {"success" : True}

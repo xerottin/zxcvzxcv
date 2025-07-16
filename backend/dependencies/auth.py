@@ -10,7 +10,7 @@ from db.session import get_pg_db
 from dependencies.permission import ASSIGN_RULES
 from models import User
 from core.security import decode_access_token
-from models.base import UserRole
+from models.user import UserRole
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 

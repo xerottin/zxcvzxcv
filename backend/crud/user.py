@@ -35,7 +35,7 @@ async def create_user(db: AsyncSession, data: UserCreate) -> User:
     return user
 
 async def get_users(db: AsyncSession, skip: int = 0, limit: int = 100):
-    result = await db.execute(select(User).where(is_active=True).offset(skip).limit(limit))
+    result = await db.execute(select(User).where(User.is_active==True).offset(skip).limit(limit))
     return result.scalars().all()
 
 # Read one

@@ -1,8 +1,9 @@
 from fastapi import FastAPI, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy import text
 from fastapi.middleware.cors import CORSMiddleware
 
+from core.settings import settings
 from db.session import get_pg_db
 from api import router as api_router
 

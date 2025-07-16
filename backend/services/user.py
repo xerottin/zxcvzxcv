@@ -4,7 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from models import User
-from models.base import UserRole
+from models.user import UserRole
 
 
 async def update_user_role(

@@ -2,7 +2,7 @@ from typing import Optional
 
 from pydantic import BaseModel, EmailStr
 
-from models.base import UserRole
+from models.user import UserRole
 
 
 class UserBase(BaseModel):
@@ -20,7 +20,6 @@ class UserRead(BaseModel):
 
 class UserInDB(UserBase):
     email: EmailStr
-    password: str
     phone: Optional[str] = None
     is_verified: Optional[bool] = False
     role: UserRole = UserRole.user
