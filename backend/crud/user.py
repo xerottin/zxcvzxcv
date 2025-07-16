@@ -6,6 +6,7 @@ from sqlalchemy import select
 from fastapi import HTTPException
 
 from models import User
+from models.user import UserRole
 from schemas.user import UserCreate, UserUpdate
 from utils.security import get_password_hash
 
@@ -40,7 +41,7 @@ async def get_users(db: AsyncSession, skip: int = 0, limit: int = 100):
 
 # Read one
 async def get_user(db: AsyncSession, user_id: int):
-    result = await db.execute(select(User).where(User.id == user_id, is_active=True))
+    result = await db.execute(select(User).where(User.id == user_id, User.is_active==True))
     user = result.scalars().first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -69,3 +70,21 @@ async def delete_user(db: AsyncSession, user_id: int):
     return {"ok": True}
 
 
+async def update_user_role(
+    db: AsyncSession,
+    user_id: int,
+    new_role: UserRole
+) -> User:
+    query = await db.execute(select(User).where(User.id == user_id))
+    user = query.scalar_one_or_none()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if user.role == new_role:
+        return user
+
+    user.role = new_role
+    db.add(user)
+    await db.commit()
+    await db.refresh(user)
+    return user

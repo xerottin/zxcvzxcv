@@ -36,7 +36,6 @@ class UserCreate(UserBase):
 
 
 class UserUpdate(UserBase):
-    role: UserRole = UserRole.user
     password: Optional[str] = None
     phone: Optional[str] = None
     is_verified: Optional[bool] = False
