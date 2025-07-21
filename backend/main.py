@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -10,7 +10,6 @@ from api import router as api_router
 import logging
 from contextlib import asynccontextmanager
 
-# Настройка логирования
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
