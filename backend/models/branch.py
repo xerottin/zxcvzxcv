@@ -16,3 +16,20 @@ class Branch(BaseModel):
 
     company_id = Column(Integer, ForeignKey('company.id'))
     owner_id = Column(Integer, ForeignKey('users.id'))
+
+class Menu(BaseModel):
+    __tablename__ = "menus"
+    name = Column(String, unique=True, nullable=False)
+    logo = Column(String)
+    branch = relationship("Branch", back_populates="menus")
+
+    branch_id = Column(Integer, ForeignKey('branches.id'))
+
+class MenuItem(BaseModel):
+    __tablename__ = "menu_items"
+    name = Column(String, unique=True, nullable=False)
+    logo = Column(String)
+    menu = relationship("Menu", back_populates="menus")
+
+    menu_id = Column(Integer, ForeignKey('menus.id'))
+

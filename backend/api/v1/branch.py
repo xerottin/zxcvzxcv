@@ -6,7 +6,6 @@ from db.session import get_pg_db
 from dependencies.auth import require_admin_or_company
 from models import User
 from schemas.branch import BranchInDb, BranchCreate
-from schemas.company import CompanyCreate, CompanyInDb
 
 router = APIRouter(prefix="", tags=["Branches"])
 

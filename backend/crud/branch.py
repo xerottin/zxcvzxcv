@@ -16,7 +16,8 @@ async def create_branch(db: AsyncSession, data: BranchCreate) -> Branch:
     await db.refresh(branch)
     return branch
 
-async def update_owner_role_branch( branch_id: int, owner_id: int, db: AsyncSession):
+
+async def update_owner_role_branch(branch_id: int, owner_id: int, db: AsyncSession):
     query = await db.execute(select(Branch).where(Branch.id == branch_id))
     branch = query.scalar_one_or_none()
     if not branch or branch.is_active == False:
