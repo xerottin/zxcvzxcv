@@ -10,8 +10,9 @@ from models.user import UserRole
 from schemas.user import UserCreate, UserUpdate
 from utils.security import get_password_hash
 
+
 async def create_user(db: AsyncSession, data: UserCreate) -> User:
-    if await db.scalar(select(User).where(User.email == data.email)):
+    if await db.scalar(select(User).where(User.email == data.email and User.is_active == True)):
         raise HTTPException(status_code=409, detail="Email already registered")
 
     if not data.username:
@@ -35,24 +36,28 @@ async def create_user(db: AsyncSession, data: UserCreate) -> User:
     await db.refresh(user)
     return user
 
+
 async def get_users(db: AsyncSession, skip: int = 0, limit: int = 100):
-    result = await db.execute(select(User).where(User.is_active==True).offset(skip).limit(limit))
+    result = await db.execute(select(User).where(User.is_active == True).offset(skip).limit(limit))
     return result.scalars().all()
+
 
 # Read one
 async def get_user(db: AsyncSession, user_id: int):
-    result = await db.execute(select(User).where(User.id == user_id, User.is_active==True))
+    result = await db.execute(select(User).where(User.id == user_id, User.is_active == True))
     user = result.scalars().first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
+
 async def get_by_username(db: AsyncSession, username: str):
-    result = await db.execute(select(User).where(User.username == username, User.is_active==True))
+    result = await db.execute(select(User).where(User.username == username) & (User.is_active == True))
     user = result.scalars().first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
+
 
 async def update_user(db: AsyncSession, user_id: int, user_update: UserUpdate):
     user = await get_user(db, user_id)
@@ -62,22 +67,26 @@ async def update_user(db: AsyncSession, user_id: int, user_update: UserUpdate):
     await db.refresh(user)
     return user
 
+
 async def delete_user(db: AsyncSession, user_id: int):
     user = await get_user(db, user_id)
-    user.is_active = False
-    await db.commit()
-    await db.refresh(user)
-    return {"ok": True}
+    if user.is_active == True:
+        user.is_active = False
+        await db.commit()
+        await db.refresh(user)
+        return {"ok": True}
+    else:
+        return {"user not found": False}
 
 
 async def update_user_role(
-    db: AsyncSession,
-    user_id: int,
-    new_role: UserRole
+        db: AsyncSession,
+        user_id: int,
+        new_role: UserRole
 ) -> User:
     query = await db.execute(select(User).where(User.id == user_id))
     user = query.scalar_one_or_none()
-    if not user:
+    if not user or user.is_active == False:
         raise HTTPException(status_code=404, detail="User not found")
 
     if user.role == new_role:

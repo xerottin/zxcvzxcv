@@ -25,7 +25,7 @@ async def get_me(current_user: User = Depends(get_current_user)):
     return current_user
 
 
-@router.get("/{user_id}", response_model=List[UserInDB])
+@router.get("/list_users", response_model=List[UserInDB])
 async def list_users(db: AsyncSession = Depends(get_pg_db), current_user: User = Depends(get_current_user)):
     return await get_users(db)
 
