@@ -2,6 +2,7 @@ import enum
 
 from sqlalchemy import Column, String, Boolean
 from sqlalchemy import Enum as SAEnum
+from sqlalchemy.orm import relationship
 
 from models.base import BaseModel
 
@@ -22,3 +23,6 @@ class User(BaseModel):
     phone = Column(String, unique=True, nullable=True)
     is_verified = Column(Boolean, nullable=True, default=False)
     role = Column(SAEnum(UserRole, name="user_role", create_type=True), default=UserRole.user)
+
+    branch =relationship("Branch", back_populates="owner")
+    company = relationship("Company", back_populates="owner")
