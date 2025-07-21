@@ -1,7 +1,7 @@
 from fastapi import APIRouter, status, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from crud.company import create_company, update_owner_role
+from crud.company import create_company, update_owner_role_company
 from db.session import get_pg_db
 from dependencies.auth import require_admin
 from models import User
@@ -26,4 +26,4 @@ async def add_owner_company(
         current_user: User = Depends(require_admin),
         db: AsyncSession = Depends(get_pg_db)
 ):
-    return await update_owner_role(company_id, owner_id, db)
+    return await update_owner_role_company(company_id, owner_id, db)

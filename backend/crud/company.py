@@ -16,7 +16,7 @@ async def create_company(db: AsyncSession, data: CompanyCreate) -> Company:
     await db.refresh(company)
     return company
 
-async def update_owner_role( company_id: int, owner_id: int, db: AsyncSession):
+async def update_owner_role_company( company_id: int, owner_id: int, db: AsyncSession):
     query = await db.execute(select(Company).where(Company.id == company_id))
     company = query.scalar_one_or_none()
     if not company or company.is_active == False:
