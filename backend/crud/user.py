@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from fastapi import HTTPException
 
+from main import logger
 from models import User
 from models.user import UserRole
 from schemas.user import UserCreate, UserUpdate
