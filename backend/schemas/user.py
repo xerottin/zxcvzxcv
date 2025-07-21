@@ -1,6 +1,6 @@
 from typing import Optional
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, validator, Field
 
 from models.user import UserRole
 
@@ -30,10 +30,15 @@ class UserInDB(UserBase):
 
 
 class UserCreate(UserBase):
-    email: EmailStr
-    password: str
-    role: UserRole = UserRole.user
 
+    email: EmailStr
+    password: str = Field(..., min_length=8, max_length=128)
+    role: UserRole = UserRole.user
+    @validator('password')
+    def validate_password(cls, v):
+        if len(v) < 8:
+            raise ValueError('Password too short')
+        return v
 
 class UserUpdate(UserBase):
     password: Optional[str] = None

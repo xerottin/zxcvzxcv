@@ -12,29 +12,52 @@ from utils.security import get_password_hash
 
 
 async def create_user(db: AsyncSession, data: UserCreate) -> User:
-    if await db.scalar(select(User).where(User.email == data.email and User.is_active == True)):
-        raise HTTPException(status_code=409, detail="Email already registered")
+    try:
+        existing_user = await db.scalar(
+            select(User).where(
+                (User.email == data.email) & (User.is_active == True)
+            )
+        )
+        if existing_user:
+            raise HTTPException(status_code=409, detail="Email already registered")
 
-    if not data.username:
-        base = re.split(r"@+", data.email)[0]
-        base = re.sub(r"\W+", "", base) or "user"
-        username = f"{base}_{uuid4().hex[:6]}"
-    else:
-        username = data.username
+        if not data.username:
+            base = re.split(r"@+", data.email)[0]
+            base = re.sub(r"\W+", "", base) or "user"
+            username = f"{base}_{uuid4().hex[:6]}"
+        else:
+            username = data.username
 
-    exists = await db.scalar(select(User).where(User.username == username))
-    if exists:
-        username = f"{username}_{uuid4().hex[:4]}"
+        existing_username = await db.scalar(
+            select(User).where(User.username == username)
+        )
+        if existing_username:
+            username = f"{username}_{uuid4().hex[:4]}"
 
-    user = User(
-        username=username,
-        email=data.email,
-        hashed_password=get_password_hash(data.password),
-    )
-    db.add(user)
-    await db.commit()
-    await db.refresh(user)
-    return user
+        user = User(
+            username=username,
+            email=data.email,
+            hashed_password=get_password_hash(data.password),
+        )
+
+        db.add(user)
+        await db.commit()
+        await db.refresh(user)
+        return user
+
+    except HTTPException as http_exc:
+        await db.rollback()
+        raise http_exc
+
+    except ValueError as val_err:
+        await db.rollback()
+        logger.error(f"Validation error in create_user: {val_err}")
+        raise HTTPException(status_code=400, detail=str(val_err))
+
+    except Exception as e:
+        await db.rollback()
+        logger.error(f"Unexpected error in create_user: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 async def get_users(db: AsyncSession, skip: int = 0, limit: int = 100):
