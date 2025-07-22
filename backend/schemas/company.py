@@ -1,16 +1,16 @@
+from datetime import datetime
 from typing import Optional
 
 from pydantic import BaseModel
 
 
 class CompanyBase(BaseModel):
-    id: int
     name: str
     phone: Optional[str] = None
     email: Optional[str] = None
     logo: Optional[str] = None
     address: Optional[str] = None
-    user_id = int
+    owner_id: Optional[int] = None
     class Config:
         orm_mode = True
 
@@ -18,4 +18,6 @@ class CompanyCreate(CompanyBase):
     pass
 
 class CompanyInDb(CompanyBase):
-    pass
+    id: int
+    created_at: datetime
+    updated_at: datetime

@@ -12,7 +12,10 @@ class Branch(BaseModel):
     latitude = Column(Float)
     longitude = Column(Float)
     rating = Column(Float)
-    owner = relationship("User", back_populates="branch")
 
     company_id = Column(Integer, ForeignKey('company.id'))
     owner_id = Column(Integer, ForeignKey('users.id'))
+
+    # Relationships
+    owner = relationship("User", back_populates="branch")
+    menus = relationship("Menu", back_populates="branch")  # Добавляем эту строку
