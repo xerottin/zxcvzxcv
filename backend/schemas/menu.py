@@ -48,3 +48,4 @@ class MenuItemResponse(MenuItemBase):
 
     class Config:
         orm_mode = True
+
