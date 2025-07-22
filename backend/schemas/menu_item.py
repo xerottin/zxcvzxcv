@@ -17,6 +17,14 @@ class MenuItemCreate(MenuItemBase):
     pass
 
 
+class MenuItemUpdate(BaseModel):
+    name: Optional[str] = Field(None, min_length=1, max_length=100, description="Menu item name")
+    description: Optional[str] = Field(None, max_length=500, description="Item description")
+    price: Optional[int]
+    logo: Optional[str] = Field(None, description="Item image URL")
+    is_available: Optional[bool] = Field(None, description="Item availability status")
+
+
 class MenuItemResponse(MenuItemBase):
     id: int
     created_at: datetime

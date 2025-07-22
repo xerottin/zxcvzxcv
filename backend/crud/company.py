@@ -70,7 +70,7 @@ async def delete_company(db: AsyncSession, company_id: int):
             await db.commit()
             await db.refresh(company)
 
-        return {"success": True, "message": "Company deactivated"}
+        return {"success": True}
 
     except HTTPException:
         raise

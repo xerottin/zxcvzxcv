@@ -73,13 +73,14 @@ async def get_menu(db: AsyncSession, menu_id: int) -> Menu:
     try:
         query = (
             select(Menu)
-            .options(selectinload(Menu.branch))  # Load related branch data
+            .options(selectinload(Menu.branch))
             .where(Menu.id == menu_id)
         )
         result = await db.execute(query)
         menu = result.scalar_one_or_none()
 
         if not menu:
+
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"Menu with ID {menu_id} not found"
@@ -315,7 +316,7 @@ async def patch_menu(db: AsyncSession, menu_id: int, data: MenuPatch) -> Menu:
         )
 
 
-async def delete_menu(db: AsyncSession, menu_id: int) -> None:
+async def delete_menu(db: AsyncSession, menu_id: int):
     try:
         menu = await get_menu(db, menu_id)
 
@@ -324,7 +325,7 @@ async def delete_menu(db: AsyncSession, menu_id: int) -> None:
             await db.commit()
             await db.refresh(menu)
 
-        return {"success": True, "message": "Successfully deleted menu"}
+        return {"success": True}
 
     except HTTPException:
         raise
