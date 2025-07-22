@@ -78,7 +78,8 @@ async def get_user(db: AsyncSession, user_id: int):
 
 
 async def get_by_username(db: AsyncSession, username: str):
-    result = await db.execute(select(User).where(User.username == username) & (User.is_active == True))
+    # result = await db.execute(select(User).where((User.username == username) & (User.is_active == True)))
+    result = await db.execute(select(User).where(User.username == username, User.is_active == True))
     user = result.scalars().first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -86,23 +87,39 @@ async def get_by_username(db: AsyncSession, username: str):
 
 
 async def update_user(db: AsyncSession, user_id: int, user_update: UserUpdate):
-    user = await get_user(db, user_id)
-    for key, value in user_update.dict(exclude_unset=True).items():
-        setattr(user, key, value)
-    await db.commit()
-    await db.refresh(user)
-    return user
+    try:
+        user = await get_user(db, user_id)
+
+        protected_fields = {'id', 'created_at', 'hashed_password'}
+        update_data = user_update.dict(exclude_unset=True)
+
+        for key, value in update_data.items():
+            if key not in protected_fields:
+                setattr(user, key, value)
+
+        await db.commit()
+        await db.refresh(user)
+        return user
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        await db.rollback()
+        logger.error(f"Error updating user {user_id}: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 async def delete_user(db: AsyncSession, user_id: int):
     user = await get_user(db, user_id)
-    if user.is_active == True:
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if user.is_active:
         user.is_active = False
         await db.commit()
         await db.refresh(user)
-        return {"ok": True}
-    else:
-        return {"user not found": False}
+
+    return {"success": True, "message": "User deactivated"}
 
 
 async def update_user_role(
@@ -119,7 +136,6 @@ async def update_user_role(
         return user
 
     user.role = new_role
-    db.add(user)
     await db.commit()
     await db.refresh(user)
     return user
