@@ -7,18 +7,15 @@ from models.branch import Menu, MenuItem
 from typing import Optional
 import logging
 
-from schemas.menu import MenuCreate, MenuItemCreate
+from schemas.menu import MenuCreate, MenuItemCreate, MenuResponse
+from models.branch import Branch
 
 logger = logging.getLogger(__name__)
 
 
 
-
-async def create_branch_menu(db: AsyncSession, data: MenuCreate) -> Menu:
-
+async def create_branch_menu(db: AsyncSession, data: MenuCreate):
     try:
-        # Validate that branch exists
-        from models.branch import Branch  # Импортируем Branch
         branch_query = select(Branch).where(Branch.id == data.branch_id)
         branch_result = await db.execute(branch_query)
         branch = branch_result.scalar_one_or_none()
@@ -29,18 +26,14 @@ async def create_branch_menu(db: AsyncSession, data: MenuCreate) -> Menu:
                 detail=f"Branch with ID {data.branch_id} not found"
             )
 
-        new_menu = Menu(
-            name=data.name.strip(),
-            logo=data.logo,
-            branch_id=data.branch_id
-        )
+        menu = Menu(**data.dict())
 
-        db.add(new_menu)
+        db.add(menu)
         await db.commit()
-        await db.refresh(new_menu)
+        await db.refresh(menu)
 
-        logger.info(f"Menu created successfully: {new_menu.id}")
-        return new_menu
+        logger.info(f"Menu created successfully: {menu.id}")
+        return menu
 
     except HTTPException:
         await db.rollback()
@@ -49,7 +42,6 @@ async def create_branch_menu(db: AsyncSession, data: MenuCreate) -> Menu:
     except IntegrityError as e:
         await db.rollback()
         logger.error(f"Integrity error creating menu: {str(e)}")
-
         if "unique constraint" in str(e).lower():
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -74,15 +66,12 @@ async def create_branch_menu(db: AsyncSession, data: MenuCreate) -> Menu:
             detail="Internal server error occurred while creating menu"
         )
 
-
 async def create_menu_item_crud(
         db: AsyncSession,
         data: MenuItemCreate,
         current_user_id: Optional[int] = None
 ) -> MenuItem:
-
     try:
-        # Validate menu exists and is active
         menu_query = select(Menu).where(
             Menu.id == data.menu_id,
             Menu.is_active == True

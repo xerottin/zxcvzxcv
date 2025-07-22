@@ -17,11 +17,13 @@ class MenuCreate(MenuBase):
 
 
 class MenuResponse(MenuBase):
+    id: int
     created_at: datetime
     updated_at: datetime
-    is_active: bool = True
+    is_active: bool
 
-    model_config = ConfigDict(from_attributes=True)
+    class Config:
+        orm_mode = True
 
 
 # MenuItem schemas
@@ -44,4 +46,5 @@ class MenuItemResponse(MenuItemBase):
     updated_at: datetime
     is_active: bool
 
-    model_config = ConfigDict(from_attributes=True)
+    class Config:
+        orm_mode = True
