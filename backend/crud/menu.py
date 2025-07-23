@@ -27,7 +27,7 @@ async def create_menu(db: AsyncSession, data: MenuCreate) -> Menu:
                 detail=f"Branch with ID {data.branch_id} not found"
             )
 
-        menu = Menu(**data.dict())
+        menu = Menu(**data.dict(exclude_unset=True))
         db.add(menu)
         await db.commit()
         await db.refresh(menu)
@@ -168,7 +168,7 @@ async def update_menu(db: AsyncSession, menu_id: int, data: MenuUpdate) -> Menu:
                     detail=f"Branch with ID {data.branch_id} not found"
                 )
 
-        update_data = data.dict()
+        update_data = data.dict(exclude_unset=True)
 
         stmt = (
             update(Menu)
@@ -224,7 +224,7 @@ async def patch_menu(db: AsyncSession, menu_id: int, data: MenuPatch) -> Menu:
     try:
         menu = await get_menu(db, menu_id)
 
-        update_data = data.dict()
+        update_data = data.dict(exclude_unset=True)
 
         if not update_data:
             logger.info(f"No fields to update for menu {menu_id}")

@@ -14,7 +14,7 @@ async def create_company(db: AsyncSession, data: CompanyCreate) -> Company:
         if await db.scalar(select(Company).where(Company.name == data.name, Company.is_active)):
             raise HTTPException(status_code=409, detail="Company already exists")
 
-        company = Company(**data.dict())
+        company = Company(**data.dict(exclude_unset=True))
         db.add(company)
         await db.commit()
         await db.refresh(company)

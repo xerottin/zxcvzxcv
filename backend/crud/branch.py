@@ -14,7 +14,7 @@ async def create_branch(db: AsyncSession, data: BranchCreate) -> Branch:
         if await db.scalar(select(Branch).where(Branch.username == data.username, Branch.is_active)):
             raise HTTPException(status_code=409, detail="Branch already exists")
 
-        branch = Branch(**data.dict())
+        branch = Branch(**data.dict(exclude_unset=True))
         db.add(branch)
         await db.commit()
         await db.refresh(branch)
