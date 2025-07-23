@@ -1,3 +1,5 @@
+import logging
+
 from datetime import datetime, timedelta
 from typing import Any, Optional
 
@@ -8,12 +10,12 @@ from passlib.context import CryptContext
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.settings import settings
-from crud.user import get_by_username, get_user
+from crud.user import get_by_username
 from db.session import get_pg_db
-from schemas.token import TokenData
-from models.user import User
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+logger = logging.getLogger(__name__)
 def verify_password(plain: str, hashed: str) -> bool:
     return pwd_context.verify(plain, hashed)
 
@@ -43,14 +45,15 @@ def decode_access_token(token: str) -> dict[str, Any]:
             headers={"WWW-Authenticate": "Bearer"},
         ) from exc
 
-async def authenticate_user(
-    db: AsyncSession,
-    username: str,
-    password: str
-) -> Optional[User]:
+async def authenticate_user(db: AsyncSession, username: str, password: str):
     user = await get_by_username(db, username)
-    if not user or not verify_password(password, user.hashed_password):
+    if not user:
+        logger.warning(f"Failed login attempt for username: {username}")
         return None
+    if not verify_password(password, user.hashed_password):
+        logger.warning(f"Wrong password for user: {username}")
+        return None
+    logger.info(f"Successful login for user: {username}")
     return user
 
 async def login_for_access_token(
@@ -69,24 +72,3 @@ async def login_for_access_token(
         "role": user.role.value
     })
     return {"access_token": token, "token_type": "bearer"}
-
-async def get_current_user(
-    token: str = Depends(oauth2_scheme),
-    db: AsyncSession = Depends(get_pg_db)
-) -> User:
-    payload = decode_access_token(token)
-    user_id = payload.get("sub")
-    if user_id is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    user = await get_user(db, int(user_id))
-    if not user or not user.is_active:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Inactive or non-existent user",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    return user
