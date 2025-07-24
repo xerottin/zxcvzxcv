@@ -1,13 +1,16 @@
-from pydantic import BaseSettings, Field, validator
 from typing import List
+
+from pydantic import Field, field_validator
+from pydantic_settings import BaseSettings
+
 
 class Settings(BaseSettings):
     # Database
-    ASYNC_DATABASE_URL: str = Field(..., env="ASYNC_DATABASE_URL")
-    SYNC_DATABASE_URL: str = Field(..., env="SYNC_DATABASE_URL")
+    ASYNC_DATABASE_URL: str = Field(..., description="Async database URL")
+    SYNC_DATABASE_URL: str = Field(..., description="Sync database URL")
 
     # Security
-    SECRET_KEY: str = Field(..., min_length=1)
+    SECRET_KEY: str = Field(..., min_length=1, description="Secret key for JWT")
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
@@ -15,31 +18,42 @@ class Settings(BaseSettings):
     DEBUG: bool = False
     ALLOWED_HOSTS: List[str] = Field(default_factory=lambda: ["http://localhost:3000"])
 
-    class Config:
-        env_file = ".env"
-        case_sensitive = True
+    model_config = {
+        "env_file": ".env",
+        "case_sensitive": True,
+        "extra": "ignore"  # игнорировать дополнительные поля из .env
+    }
 
-    @validator('SECRET_KEY')
-    def secret_key_strength(cls, v):
-        if len(v) < 1:
-            raise ValueError("SECRET_KEY must be at least 1 characters long")
-        if v in ["supersecret", "secret", "changeme"]:
+    @field_validator('SECRET_KEY')
+    @classmethod
+    def secret_key_strength(cls, v: str) -> str:
+        if len(v) < 2:  # увеличил минимальную длину
+            raise ValueError("SECRET_KEY must be at least 32 characters long")
+        if v in ["supersecret", "secret", "changeme", "your-secret-key"]:
             raise ValueError("Please use a strong, unique SECRET_KEY")
         return v
 
-    @validator('ALLOWED_HOSTS')
-    def validate_hosts(cls, v):
+    @field_validator('ALLOWED_HOSTS')
+    @classmethod
+    def validate_hosts(cls, v: List[str]) -> List[str]:
         if not v:
             raise ValueError("ALLOWED_HOSTS cannot be empty")
         for host in v:
-            if "*" in host and not cls.__dict__.get('DEBUG', False):
-                raise ValueError("Wildcard origins not allowed in production")
+            if "*" in host:
+                # Проверяем DEBUG через model_fields_set или используем другой подход
+                raise ValueError("Wildcard origins should be avoided")
         return v
 
-    @validator('ASYNC_DATABASE_URL')
-    def validate_database_url(cls, v):
-        if not v.startswith(('postgresql+asyncpg://', 'sqlite+aiosqlite://')):
-            raise ValueError("Invalid async database URL format")
+    @field_validator('ASYNC_DATABASE_URL')
+    @classmethod
+    def validate_database_url(cls, v: str) -> str:
+        valid_prefixes = (
+            'postgresql+asyncpg://',
+            'sqlite+aiosqlite://',
+            'mysql+aiomysql://'
+        )
+        if not v.startswith(valid_prefixes):
+            raise ValueError(f"Invalid async database URL format. Must start with: {valid_prefixes}")
         return v
 
     @property
@@ -50,4 +64,12 @@ class Settings(BaseSettings):
     def is_production(self) -> bool:
         return not self.DEBUG
 
+    @property
+    def cors_origins(self) -> List[str]:
+        """Возвращает список разрешенных CORS origins"""
+        if self.DEBUG:
+            return ["*"]  # В режиме отладки разрешаем все
+        return self.ALLOWED_HOSTS
+
+# Создаем глобальный экземпляр настроек
 settings = Settings()

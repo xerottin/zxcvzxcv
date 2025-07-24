@@ -12,7 +12,7 @@ class CompanyBase(BaseModel):
     address: Optional[str] = None
     owner_id: Optional[int] = None
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class CompanyCreate(CompanyBase):
     pass

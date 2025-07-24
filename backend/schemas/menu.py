@@ -21,14 +21,14 @@ class MenuResponse(MenuBase):
     is_active: bool
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class MenuUpdate(MenuBase):
     is_active: bool = True
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class MenuPatch(BaseModel):
@@ -38,4 +38,4 @@ class MenuPatch(BaseModel):
     is_active: Optional[bool] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
