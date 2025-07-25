@@ -11,8 +11,9 @@ class CompanyBase(BaseModel):
     logo: Optional[str] = None
     address: Optional[str] = None
     owner_id: Optional[int] = None
-    class Config:
-        from_attributes = True
+    model_config = {
+        "from_attributes": True
+    }
 
 class CompanyCreate(CompanyBase):
     pass

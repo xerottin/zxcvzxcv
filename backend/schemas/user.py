@@ -14,8 +14,9 @@ class UserRead(BaseModel):
     username: str
     email: EmailStr
 
-    class Config:
-        from_attributes = True
+    model_config = {
+        "from_attributes": True
+    }
 
 
 class UserInDB(UserBase):
@@ -24,9 +25,10 @@ class UserInDB(UserBase):
     is_verified: Optional[bool] = False
     role: UserRole = UserRole.user
 
-    class Config:
-        from_attributes = True
-        use_enum_values = True
+    model_config = {
+        "from_attributes": True,
+        "use_enum_values": True
+    }
 
 
 class UserCreate(UserBase):
