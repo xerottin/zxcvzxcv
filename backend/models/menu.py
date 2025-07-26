@@ -1,3 +1,4 @@
+from typing import List
 from sqlalchemy import Column, String, Integer, ForeignKey, Text, Numeric, Boolean
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 
@@ -5,17 +6,18 @@ from models import BaseModel
 
 
 class Menu(BaseModel):
-    __tablename__ = "menus"
-    name = Column(String, unique=True, nullable=False)
-    logo = Column(String)
+    __tablename__ = "menu"
 
-    branch_id = Column(Integer, ForeignKey('branches.id'), nullable=False)
-    branch = relationship("Branch", back_populates="menus")
-    items = relationship("MenuItem", back_populates="menu", cascade="all, delete-orphan")
-
+    username: Mapped[str] = mapped_column(String(15), unique=True, nullable=False)
+    logo: Mapped[str] = mapped_column(String(255), nullable=True)
+    description: Mapped[str] = mapped_column(Text, nullable=True)
+    branch_id: Mapped[int] = mapped_column(Integer, ForeignKey('branch.id'), nullable=False)
+    
+    branch: Mapped["Branch"] = relationship("Branch", back_populates="menu", uselist=False)
+    items: Mapped[List["MenuItem"]] = relationship("MenuItem", back_populates="menu", cascade="all, delete-orphan") 
 
 class MenuItem(BaseModel):
-    __tablename__ = "menu_items"
+    __tablename__ = "menu_item"
 
     name = Column(String, nullable=False)
     logo = Column(String)
@@ -23,5 +25,12 @@ class MenuItem(BaseModel):
     price = Column(Integer)
     is_available = Column(Boolean, default=True)
 
-    menu_id: Mapped[int] = mapped_column(Integer, ForeignKey('menus.id'), nullable=False)
-    menu = relationship("Menu", back_populates="items")
+    menu_id: Mapped[int] = mapped_column(Integer, ForeignKey('menu.id'), nullable=False)
+    menu = relationship("Menu", back_populates="item")
+
+
+    username: Mapped[str] = mapped_column(String(15), unique=True, nullable=False)
+    logo: Mapped[str] = mapped_column(String(255), nullable=True)
+    description: Mapped[str] = mapped_column(Text, nullable=True)
+    menu_id: Mapped[int] = mapped_column(Integer, ForeignKey('menu.id'), nullable=False)
+    menu: Mapped["Menu"] = relationship("Menu", back_populates="item", uselist=False)

@@ -1,21 +1,20 @@
-from sqlalchemy import Column, String, Float, Integer, ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy import String, Float, Integer, ForeignKey
+from sqlalchemy.orm import relationship, Mapped, mapped_column
 
 from models import BaseModel
 
 
 class Branch(BaseModel):
-    __tablename__ = "branches"
-    username = Column(String, unique=True, nullable=False)
-    phone = Column(String)
-    url = Column(String)
-    latitude = Column(Float)
-    longitude = Column(Float)
-    rating = Column(Float)
+    __tablename__ = "branch"
 
-    company_id = Column(Integer, ForeignKey('company.id'))
-    owner_id = Column(Integer, ForeignKey('users.id'))
+    username: Mapped[str] = mapped_column(String(15), unique=True, nullable=False)
+    phone: Mapped[str] = mapped_column(String(15))
+    url: Mapped[str] = mapped_column(String(255))
+    latitude: Mapped[float] = mapped_column(Float)
+    longitude: Mapped[float] = mapped_column(Float)
+    rating: Mapped[float] = mapped_column(Float)
+    company_id: Mapped[int] = mapped_column(Integer, ForeignKey('company.id'))
+    owner_id: Mapped[int] = mapped_column(Integer, ForeignKey('user.id'))
 
-    # Relationships
-    owner = relationship("User", back_populates="branch")
-    menus = relationship("Menu", back_populates="branch")  # Добавляем эту строку
+    company: Mapped["Company"] = relationship("Company", back_populates="branch")
+    owner: Mapped["User"] = relationship("User", back_populates="branch", uselist=False)
