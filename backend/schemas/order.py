@@ -4,6 +4,7 @@ from models.base import BaseModel
 
 
 class OrderCreate(BaseModel):
+    user_id: int
     menu_item_id: int
     quantity: int = 1
     special_instructions: str = None
