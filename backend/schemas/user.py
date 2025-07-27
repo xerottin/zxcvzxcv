@@ -1,46 +1,48 @@
 from typing import Optional
 
-from pydantic import BaseModel, EmailStr, validator, Field
+from pydantic import BaseModel, EmailStr, field_validator, Field
+from datetime import datetime
 
 from models.user import UserRole
 
-
 class UserBase(BaseModel):
-    username: Optional[str] = None
+    username: str | None = None
 
 
-class UserRead(BaseModel):
-    id: int
-    username: str
+class UserCreate(UserBase):
+    password: str
     email: EmailStr
+    role: UserRole = UserRole.user
 
-    model_config = {
-        "from_attributes": True
-    }
-
+    @field_validator('password')
+    @classmethod
+    def validate_password(cls, v):
+        if len(v) < 8:
+            raise ValueError('Password too short')
+        return v
 
 class UserInDB(UserBase):
+    id: int
     email: EmailStr
-    phone: Optional[str] = None
-    is_verified: Optional[bool] = False
-    role: UserRole = UserRole.user
+    phone = str | None = None
+    is_verified: bool = False
+    role: UserRole
+    created_at: datetime
+    updated_at: datetime
 
     model_config = {
         "from_attributes": True,
         "use_enum_values": True
     }
 
-
-class UserCreate(UserBase):
-
+class UserResponse(UserBase):
+    id: int
     email: EmailStr
-    password: str = Field(..., min_length=8, max_length=128)
-    role: UserRole = UserRole.user
-    @validator('password')
-    def validate_password(cls, v):
-        if len(v) < 8:
-            raise ValueError('Password too short')
-        return v
+    phone: str | None = None
+    is_verified: bool = False
+    role: UserRole
+    created_at: datetime
+    updated_at: datetime
 
 class UserUpdate(UserBase):
     password: Optional[str] = None

@@ -3,22 +3,38 @@ from typing import Optional
 
 from pydantic import BaseModel
 
+class CompanyCreate(BaseModel):
+    username: str
+    phone: str = None | None
+    url: str = None | None
+    email: str = None | None
+    logo: str = None | None
+    address: str = None | None
+    owner_id: int
 
-class CompanyBase(BaseModel):
-    name: str
-    phone: Optional[str] = None
-    email: Optional[str] = None
-    logo: Optional[str] = None
-    address: Optional[str] = None
-    owner_id: Optional[int] = None
+class CompanyInDB(BaseModel):
+    id: int
+    username: str
+    phone: str = None | None
+    url: str = None | None
+    email: str = None | None
+    logo: str = None | None
+    address: str = None | None
+    owner_id: int
+    branch: list = []
+    created_at: datetime
+    updated_at: datetime
+
     model_config = {
         "from_attributes": True
     }
 
-class CompanyCreate(CompanyBase):
-    pass
+class CompanyUpdate(BaseModel):
+    username: str | None = None
+    phone: str | None = None
+    url: str | None = None
+    email: str | None = None
+    logo: str | None = None
+    address: str | None = None
 
-class CompanyInDb(CompanyBase):
-    id: int
-    created_at: datetime
-    updated_at: datetime
+

@@ -16,8 +16,7 @@ class Company(BaseModel):
     logo: Mapped[str] = mapped_column(String(255))
     address: Mapped[str] = mapped_column(String(255))
     owner_id: Mapped[int] = mapped_column(Integer, ForeignKey('user.id'), unique=True)
-    branches: Mapped[List["Branch"]] = relationship("Branch", back_populates="company")
+    branch: Mapped[List["Branch"]] = relationship("Branch", back_populates="company")
 
     owner: Mapped["User"] = relationship("User", back_populates="company", uselist=False)
-    branches: Mapped[List["Branch"]] = relationship("Branch", back_populates="company")
 

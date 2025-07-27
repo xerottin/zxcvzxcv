@@ -17,20 +17,14 @@ class Menu(BaseModel):
     items: Mapped[List["MenuItem"]] = relationship("MenuItem", back_populates="menu", cascade="all, delete-orphan") 
 
 class MenuItem(BaseModel):
-    __tablename__ = "menu_item"
-
-    name = Column(String, nullable=False)
-    logo = Column(String)
-    description = Column(Text)
-    price = Column(Integer)
-    is_available = Column(Boolean, default=True)
-
-    menu_id: Mapped[int] = mapped_column(Integer, ForeignKey('menu.id'), nullable=False)
-    menu = relationship("Menu", back_populates="item")
-
+    __tablename__ = "menu_item"    
 
     username: Mapped[str] = mapped_column(String(15), unique=True, nullable=False)
     logo: Mapped[str] = mapped_column(String(255), nullable=True)
     description: Mapped[str] = mapped_column(Text, nullable=True)
+    price: Mapped[float] = mapped_column(Numeric(10, 2), nullable=True)
+    is_available: Mapped[bool] = mapped_column(Boolean, default=True)
+    
     menu_id: Mapped[int] = mapped_column(Integer, ForeignKey('menu.id'), nullable=False)
+
     menu: Mapped["Menu"] = relationship("Menu", back_populates="item", uselist=False)

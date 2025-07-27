@@ -10,7 +10,9 @@ class BranchBase(BaseModel):
     longitude: Optional[float] = None
     rating: Optional[float] = None
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = {
+        "from_attributes": True
+    }
 
 class BranchCreate(BranchBase):
     pass
