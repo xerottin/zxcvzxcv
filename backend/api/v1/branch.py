@@ -16,8 +16,9 @@ async def create_branch_endpoint(
         db: AsyncSession = Depends(get_pg_db),
         current_user: User = Depends(require_admin_or_company)
 ):
+#     branch = await create_branch(db, data)
+#     return BranchInDb.from_orm(branch)
     return await create_branch(db, data)
-
 
 @router.patch("/{branch_id}", response_model=BranchInDb, status_code=status.HTTP_200_OK)
 async def add_owner_branch(

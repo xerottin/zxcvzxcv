@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel
 
@@ -21,7 +20,6 @@ class CompanyInDB(BaseModel):
     logo: str | None = None
     address: str | None = None
     owner_id: int
-    branch: list = []
     created_at: datetime
     updated_at: datetime
 

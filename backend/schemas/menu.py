@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from datetime import datetime
 
 class MenuCreate(BaseModel):
-    usernmae: str
+    username: str
     logo: str | None = None
     logo: str | None = None
     description: str | None = None

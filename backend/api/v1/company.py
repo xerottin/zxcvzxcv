@@ -12,11 +12,13 @@ router = APIRouter(prefix="", tags=["Companies"])
 
 @router.post("/", response_model=CompanyInDB, status_code=status.HTTP_201_CREATED)
 async def create_company_endpoint(
-        data: CompanyCreate,
-        db: AsyncSession = Depends(get_pg_db),
-        current_user: User = Depends(require_admin)
+    data: CompanyCreate,
+    db: AsyncSession = Depends(get_pg_db),
+    current_user: User = Depends(require_admin)
 ):
-    return await create_company(db, data)
+    company = await create_company(db, data)
+    return CompanyInDB.from_orm(company)
+
 
 
 @router.patch("/{company_id}", response_model=CompanyInDB, status_code=status.HTTP_200_OK)

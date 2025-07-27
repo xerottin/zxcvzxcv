@@ -1,14 +1,20 @@
-from typing import Optional
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel
+
+from datetime import datetime
 
 
 class BranchBase(BaseModel):
     username: str
-    url: Optional[str] = None
-    latitude: Optional[float] = None
-    longitude: Optional[float] = None
-    rating: Optional[float] = None
+    url: str | None = None
+    phone: str | None = None
+    latitude: float | None = None
+    longitude: float | None = None
+    rating: float | None = None
+
+    company_id: int | None = None
+    owner_id: int | None = None
+
 
     model_config = {
         "from_attributes": True
@@ -19,3 +25,5 @@ class BranchCreate(BranchBase):
 
 class BranchInDb(BranchBase):
     id: int
+    created_at: datetime
+    updated_at: datetime

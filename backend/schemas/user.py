@@ -17,7 +17,7 @@ class UserCreate(UserBase):
     @field_validator('password')
     @classmethod
     def validate_password(cls, v):
-        if len(v) < 8:
+        if len(v) < 2:
             raise ValueError('Password too short')
         return v
 
