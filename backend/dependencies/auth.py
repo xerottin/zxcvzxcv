@@ -64,7 +64,7 @@ async def require_admin_or_company(current_user: User = Depends(get_current_user
         raise HTTPException(status_code=403, detail="Admin or Company access required")
     return current_user
 async def require_branch(current_user: User = Depends(get_current_user)):
-    if current_user.role != UserRole.branche:
+    if current_user.role != UserRole.branch:
         raise HTTPException(status_code=403, detail="Branch access required")
     return current_user
 

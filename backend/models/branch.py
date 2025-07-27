@@ -1,3 +1,4 @@
+from typing import List
 from sqlalchemy import String, Float, Integer, ForeignKey
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 
@@ -18,3 +19,4 @@ class Branch(BaseModel):
 
     company: Mapped["Company"] = relationship("Company", back_populates="branch")
     owner: Mapped["User"] = relationship("User", back_populates="branch", uselist=False)
+    menu: Mapped[List["Menu"]] = relationship("Menu", back_populates="branch")

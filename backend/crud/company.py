@@ -9,9 +9,9 @@ from schemas.company import CompanyCreate
 logger = logging.getLogger(__name__)
 
 
-async def create_company(db: AsyncSession, data: CompanyCreate) -> Company:
+async def create_company(db: AsyncSession, data: CompanyCreate):
     try:
-        if await db.scalar(select(Company).where(Company.name == data.name, Company.is_active)):
+        if await db.scalar(select(Company).where(Company.username == data.username, Company.is_active)):
             raise HTTPException(status_code=409, detail="Company already exists")
 
         company = Company(**data.dict(exclude_unset=True))

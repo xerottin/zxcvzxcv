@@ -34,7 +34,7 @@ async def create_menu_item(
 
         existing_item_query = select(MenuItem).where(
             MenuItem.menu_id == data.menu_id,
-            MenuItem.name == data.name,
+            MenuItem.username == data.username,
             MenuItem.is_active == True
         )
         existing_result = await db.execute(existing_item_query)
@@ -43,11 +43,11 @@ async def create_menu_item(
         if existing_item:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Menu item with name '{data.name}' already exists in this menu"
+                detail=f"Menu item with name '{data.username}' already exists in this menu"
             )
 
         new_menu_item = MenuItem(
-            name=data.name.strip(),
+            username=data.username.strip(),
             description=data.description.strip() if data.description else None,
             price=data.price,
             logo=data.logo,
@@ -137,10 +137,10 @@ async def update_menu_item(
     try:
         menu_item = await get_menu_item(db, menu_item_id)
 
-        if data.name and data.name != menu_item.name:
+        if data.username and data.username != menu_item.username:
             existing_item_query = select(MenuItem).where(
                 MenuItem.menu_id == menu_item.menu_id,
-                MenuItem.name == data.name,
+                MenuItem.username == data.username,
                 MenuItem.is_active == True,
                 MenuItem.id != menu_item_id
             )
@@ -150,12 +150,12 @@ async def update_menu_item(
             if existing_item:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail=f"Menu item with name '{data.name}' already exists in this menu"
+                    detail=f"Menu item with username '{data.username}' already exists in this menu"
                 )
 
         update_data = data.dict(exclude_unset=True)
         for field, value in update_data.items():
-            if field in ['name', 'description'] and value:
+            if field in ['username', 'description'] and value:
                 value = value.strip()
             setattr(menu_item, field, value)
 
