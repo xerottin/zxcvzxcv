@@ -6,8 +6,8 @@ from decimal import Decimal
 
 class MenuItemCreate(BaseModel):
     username: str
-    logo: str = None | None
-    description: str = None | None
+    logo: str | None = None
+    description: str | None = None
     price: float
     is_available: bool = True
     menu_id: int
@@ -15,8 +15,8 @@ class MenuItemCreate(BaseModel):
 class MenuItemResponse(BaseModel):
     id: int
     username: str
-    logo: str = None | None
-    description: str = None | None
+    logo: str | None = None
+    description: str | None = None
     price: float
     is_available: bool
     menu_id: int
@@ -30,8 +30,8 @@ class MenuItemInDB(MenuItemResponse):
     pass
 
 class MenuItemUpdate(BaseModel):
-    username: str = None | None
-    logo: Optional[str] = None
-    description: Optional[str] = None
-    price: Optional[float] = None
-    is_available: Optional[bool] = None
+    username: str | None = None
+    logo: str | None = None
+    descriptiom: str | None = None
+    price: float | None = None
+    is_available: bool | None = None

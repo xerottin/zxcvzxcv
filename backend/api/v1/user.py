@@ -6,13 +6,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from crud.user import get_users, get_user, update_user, delete_user, create_user, update_user_role
 from dependencies.auth import get_current_user, check_assign_permission
 from models import User
-from schemas.user import UserCreate, UserRead, UserInDB, UserUpdate, UserRoleUpdate
+from schemas.user import UserCreate, UserInDB, UserUpdate, UserRoleUpdate
 from db.session import get_pg_db
 
 router = APIRouter()
 
 
-@router.post("/create", response_model=UserRead, status_code=status.HTTP_201_CREATED)
+@router.post("/create", response_model=UserInDB, status_code=status.HTTP_201_CREATED)
 async def create_user_endpoint(
         payload: UserCreate,
         db: AsyncSession = Depends(get_pg_db),
@@ -20,7 +20,7 @@ async def create_user_endpoint(
     return await create_user(db, payload)
 
 
-@router.get("/me", response_model=UserRead)
+@router.get("/me", response_model=UserInDB)
 async def get_me(current_user: User = Depends(get_current_user)):
     return current_user
 
@@ -52,7 +52,7 @@ async def update_user_endpoint(
 
 @router.patch(
     "/role/{user_id}",
-    response_model=UserRead,
+    response_model=UserInDB,
     status_code=status.HTTP_200_OK,
 )
 async def patch_user_role(

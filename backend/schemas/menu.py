@@ -3,15 +3,16 @@ from datetime import datetime
 
 class MenuCreate(BaseModel):
     usernmae: str
-    logo: str = None | None
-    description: str = None | None
+    logo: str | None = None
+    logo: str | None = None
+    description: str | None = None
     branch_id: int
 
 class MenuInDB(BaseModel):
     id: int
     username: str
-    logo: str = None | None
-    description: str = None | None
+    logo: str | None = None
+    description: str | None = None
     branch_id: int
     created_at: datetime
     updated_at: datetime
@@ -23,8 +24,8 @@ class MenuInDB(BaseModel):
 class MenuResponse(BaseModel):
     id: int
     username: str
-    logo: str = None | None
-    description: str = None | None
+    logo: str | None = None
+    description: str | None = None
     branch_id: int
     created_at: datetime
     updated_at: datetime
@@ -40,10 +41,10 @@ class MenuUpdate(BaseModel):
 
 
 class MenuPatch(BaseModel):
-    username: str = None | None
-    logo: str = None | None
-    description: str = None | None
-    branch_id: int = None | None
+    username: str | None = None
+    logo: str | None = None
+    description: str | None = None
+    branch_id: int | None = None
 
     model_config = {
         "from_attributes": True

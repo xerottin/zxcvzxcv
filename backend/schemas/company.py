@@ -5,21 +5,21 @@ from pydantic import BaseModel
 
 class CompanyCreate(BaseModel):
     username: str
-    phone: str = None | None
-    url: str = None | None
-    email: str = None | None
-    logo: str = None | None
-    address: str = None | None
+    phone: str | None = None
+    url: str | None = None
+    email: str | None = None
+    logo: str | None = None
+    address: str | None = None
     owner_id: int
 
 class CompanyInDB(BaseModel):
     id: int
     username: str
-    phone: str = None | None
-    url: str = None | None
-    email: str = None | None
-    logo: str = None | None
-    address: str = None | None
+    phone: str | None = None
+    url: str | None = None
+    email: str | None = None
+    logo: str | None = None
+    address: str | None = None
     owner_id: int
     branch: list = []
     created_at: datetime

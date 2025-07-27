@@ -5,8 +5,8 @@ from models.user import UserRole
 
 ASSIGN_RULES: dict[UserRole, set[UserRole]] = {
     UserRole.admin:     set(UserRole),
-    UserRole.company:   {UserRole.branche, UserRole.user},
-    UserRole.branche: {UserRole.user},
+    UserRole.company:   {UserRole.branch, UserRole.user},
+    UserRole.branch: {UserRole.user},
 }
 
 def check_assign_permission(

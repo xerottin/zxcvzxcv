@@ -5,12 +5,12 @@ from crud.company import create_company, update_company_owner, get_company, dele
 from db.session import get_pg_db
 from dependencies.auth import require_admin, require_admin_or_company
 from models import User
-from schemas.company import CompanyCreate, CompanyInDb
+from schemas.company import CompanyCreate, CompanyInDB
 
 router = APIRouter(prefix="", tags=["Companies"])
 
 
-@router.post("/", response_model=CompanyInDb, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=CompanyInDB, status_code=status.HTTP_201_CREATED)
 async def create_company_endpoint(
         data: CompanyCreate,
         db: AsyncSession = Depends(get_pg_db),
@@ -19,7 +19,7 @@ async def create_company_endpoint(
     return await create_company(db, data)
 
 
-@router.patch("/{company_id}", response_model=CompanyInDb, status_code=status.HTTP_200_OK)
+@router.patch("/{company_id}", response_model=CompanyInDB, status_code=status.HTTP_200_OK)
 async def add_owner_company(
         company_id: int,
         owner_id: int,
@@ -29,7 +29,7 @@ async def add_owner_company(
     return await update_company_owner(db, company_id, owner_id)
 
 
-@router.get("/{company_id}", response_model=CompanyInDb)
+@router.get("/{company_id}", response_model=CompanyInDB)
 async def get_company_endpoint(
         company_id: int,
         current_user: User = Depends(require_admin_or_company),

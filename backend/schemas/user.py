@@ -24,7 +24,7 @@ class UserCreate(UserBase):
 class UserInDB(UserBase):
     id: int
     email: EmailStr
-    phone = str | None = None
+    phone: str | None = None
     is_verified: bool = False
     role: UserRole
     created_at: datetime
