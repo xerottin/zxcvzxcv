@@ -22,10 +22,10 @@ class MenuItem(BaseModel):
     username: Mapped[str] = mapped_column(String(15), unique=True, nullable=False)
     logo: Mapped[str] = mapped_column(String(255), nullable=True)
     description: Mapped[str] = mapped_column(Text, nullable=True)
-    price: Mapped[float] = mapped_column(Numeric(10, 2), nullable=True)
+    price: Mapped[int] = mapped_column(Integer, nullable=True)
     is_available: Mapped[bool] = mapped_column(Boolean, default=True)
     
     menu_id: Mapped[int] = mapped_column(Integer, ForeignKey('menu.id'), nullable=False)
 
     menu: Mapped["Menu"] = relationship("Menu", back_populates="item", uselist=False)
-    order: Mapped["Order"] = relationship("Order", back_populates="menu_item", cascade="all, delete-orphan")
+    order: Mapped["Order"] = relationship("Order", back_populates="menu_item")

@@ -28,3 +28,9 @@ class OrderResponse(BaseModel):
     model_config = {
         "from_attributes": True
     }
+
+class OrderInDB(OrderResponse):
+    pass
+
+class OrderUpdate(BaseModel):
+    status: str
