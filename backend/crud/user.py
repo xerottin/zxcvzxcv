@@ -49,15 +49,6 @@ async def create_user(db: AsyncSession, data: UserCreate) -> User:
         await db.refresh(user)
         return user
 
-    except HTTPException as http_exc:
-        await db.rollback()
-        raise http_exc
-
-    except ValueError as val_err:
-        await db.rollback()
-        logger.error(f"Validation error in create_user: {val_err}")
-        raise HTTPException(status_code=400, detail=str(val_err))
-
     except Exception as e:
         await db.rollback()
         logger.error(f"Unexpected error in create_user: {e}", exc_info=True)
