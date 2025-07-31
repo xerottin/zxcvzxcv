@@ -1,7 +1,12 @@
 from fastapi import APIRouter
 
 from api import auth
-from api.v1 import user, profile, company, branch, menu, menu_item
+from api.v1 import user, company, branch, menu, menu_item
+
+"""
+Main router that includes all versioned API routes (v1).
+"""
+
 
 router = APIRouter(prefix="/api/v1")
 router.include_router(auth.router, prefix="/auth", tags=["auth"])
