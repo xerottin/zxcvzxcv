@@ -28,4 +28,4 @@ class MenuItem(BaseModel):
     menu_id: Mapped[int] = mapped_column(Integer, ForeignKey('menu.id'), nullable=False)
 
     menu: Mapped["Menu"] = relationship("Menu", back_populates="item", uselist=False)
-    order: Mapped["Order"] = relationship("Order", back_populates="menu_item")
+    basket: Mapped["Basket"] = relationship("Basket", back_populates="menu_item", cascade="all, delete-orphan")

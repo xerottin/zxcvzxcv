@@ -1,5 +1,5 @@
 import enum
-from typing import List, Optional
+from typing import List
 
 from sqlalchemy import String, Boolean
 from sqlalchemy import Enum as SAEnum
@@ -27,5 +27,6 @@ class User(BaseModel):
     )
 
     branch: Mapped[["Branch"]] = relationship("Branch", back_populates="owner", uselist=False)
-    company: Mapped[["Company"]] = relationship( "Company", back_populates="owner", uselist=False)    
+    company: Mapped[["Company"]] = relationship("Company", back_populates="owner", uselist=False)    
     order: Mapped[List["Order"]] = relationship("Order", back_populates="user")
+    basket_item: Mapped[List["Basket"]] = relationship("Basket", back_populates="user", cascade="all, delete-orphan")
