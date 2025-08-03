@@ -1,47 +1,62 @@
 import logging
 
+from fastapi import HTTPException
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from crud.basket import get_baskets
+from models.order import Order, OrderItem, OrderStatus
+from schemas.order import OrderCreate
+from services.order import generate_order_id
+
 logger = logging.getLogger(__name__)
 
 
-async def create_order(db: AsyncSession, data: OrderCreate, user_id: str) -> Order:
-    
-    db_order = Order(
-        user_id=user_id,
-        customer_name=data.customer_name,
-        customer_email=data.customer_email,
-        customer_phone=data.customer_phone,
-        shipping_address=data.shipping_address,
-        notes=data.notes
-    )
-    
-    total_amount = 0.0
-    order_items = []
-    
-    for item_data in data.items:
-        total_price = item_data.quantity * item_data.unit_price
-        total_amount += total_price
+async def create_order(db: AsyncSession, payload: OrderCreate):
+    try:
+        logger.debug(f"Creating order with payload: {payload}")
         
-        order_item = OrderItem(
-            product_name=item_data.product_name,
-            product_id=item_data.product_id,
-            quantity=item_data.quantity,
-            unit_price=item_data.unit_price,
-            total_price=total_price
+        user_baskets = await get_baskets(db, payload.user_id)
+        if not user_baskets["baskets"]:
+            raise HTTPException(status_code=404, detail="No active baskets found for user")        
+        
+        order_id = generate_order_id() 
+        order = Order(
+            username=order_id,
+            special_instructions=payload.special_instructions,
+            delivery_address=payload.delivery_address,
+            user_id=payload.user_id,
+            branch_id= payload.branch_id,
+            status=OrderStatus.PENDING,
+            total_amount=user_baskets["total_count"]
         )
-        order_items.append(order_item)
-    
-    db_order.total_amount = total_amount
-    db_order.items = order_items
-    
-    db.add(db_order)
-    await db.commit()
-    await db.refresh(db_order)
-    
-    result = await db.execute(
-        select(Order)
-        .options(selectinload(Order.items))
-        .where(Order.id == db_order.id)
-    )
-    return result.scalar_one()
+        db.add(order)
+        await db.flush()
+
+        for basket in user_baskets["baskets"]:
+            order_item = OrderItem(
+                order_id=order.id,
+                menu_item_id=basket.menu_item_id,
+                quantity=basket.quantity,
+                price=basket.menu_item.price,
+                is_active=basket.is_active,
+                total_price=basket.menu_item.price * basket.quantity
+            )
+            db.add(order_item)
+        for basket in user_baskets["baskets"]:
+            await db.delete(basket)
+
+        await db.commit()
+        await db.refresh(order)
+        
+        logger.info(f"Order created with ID: {order.username}")
+        return order
+        
+    except HTTPException:
+        await db.rollback()
+        raise
+    except Exception as e:
+        await db.rollback()
+        logger.error(f"Error creating order: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Internal server error")
         
 

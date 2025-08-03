@@ -1,4 +1,3 @@
-from typing import List
 from sqlalchemy import String, Float, Integer, ForeignKey
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 

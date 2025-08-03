@@ -2,6 +2,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import APIRouter, Depends, status
 
+from crud.order import create_order
 from schemas.order import OrderCreate, OrderInDB, OrderUpdate
 from dependencies.auth import get_current_user
 from models.user import User

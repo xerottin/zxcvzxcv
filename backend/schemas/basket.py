@@ -11,6 +11,7 @@ class MenuItemResponse(BaseModel):
     description: Optional[str] = None
     price: Optional[int] = None
     is_available: bool
+    is_active: bool
     created_at: datetime
     updated_at: datetime
 
@@ -34,7 +35,7 @@ class BasketResponse(BaseModel):
     quantity: int
     created_at: datetime
     updated_at: datetime
-    menu_item: MenuItemResponse
+    menu_item: MenuItemResponse = None
 
 
 class BasketListResponse(BaseModel):

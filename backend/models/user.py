@@ -1,17 +1,19 @@
 import enum
 from typing import List
 
-from sqlalchemy import String, Boolean
 from sqlalchemy import Enum as SAEnum
+from sqlalchemy import String, Boolean
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 
-from models.base import BaseModel
+from models import BaseModel
+
 
 class UserRole(enum.Enum):
     admin = "admin"
     company = "company"
     branch = "branch"
     user = "user"
+
 
 class User(BaseModel):
     __tablename__ = 'user'
@@ -26,7 +28,7 @@ class User(BaseModel):
         nullable=False
     )
 
-    branch: Mapped[["Branch"]] = relationship("Branch", back_populates="owner", uselist=False)
-    company: Mapped[["Company"]] = relationship("Company", back_populates="owner", uselist=False)    
+    branch: Mapped[List["Branch"]] = relationship("Branch", back_populates="owner", uselist=False)
+    company: Mapped["Company"] = relationship("Company", back_populates="owner", uselist=False)
     order: Mapped[List["Order"]] = relationship("Order", back_populates="user")
-    basket_item: Mapped[List["Basket"]] = relationship("Basket", back_populates="user", cascade="all, delete-orphan")
+    basket: Mapped["Basket"] = relationship("Basket", back_populates="user", cascade="all, delete-orphan")
