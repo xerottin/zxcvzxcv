@@ -6,7 +6,7 @@ class MenuItemCreate(BaseModel):
     username: str
     logo: str | None = None
     description: str | None = None
-    price: float
+    price: int
     is_available: bool = True
     menu_id: int
 
@@ -15,7 +15,7 @@ class MenuItemResponse(BaseModel):
     username: str
     logo: str | None = None
     description: str | None = None
-    price: float
+    price: int
     is_available: bool
     menu_id: int
     created_at: datetime
@@ -31,5 +31,5 @@ class MenuItemUpdate(BaseModel):
     username: str | None = None
     logo: str | None = None
     descriptiom: str | None = None
-    price: float | None = None
-    is_available: bool | None = None
+    price: int | None = None
+    is_available: bool = True

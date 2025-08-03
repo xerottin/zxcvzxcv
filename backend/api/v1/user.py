@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, status, Path
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from crud.user import get_users, get_user, update_user, delete_user, create_user, update_user_role
-from dependencies.auth import get_current_user, check_assign_permission
+from dependencies.auth import get_current_user, check_assign_permission, require_admin
 from models import User
 from schemas.user import UserCreate, UserInDB, UserUpdate, UserRoleUpdate
 from db.session import get_pg_db
@@ -16,12 +16,13 @@ router = APIRouter()
 async def create_user_endpoint(
         payload: UserCreate,
         db: AsyncSession = Depends(get_pg_db),
+        current_user: User = Depends(require_admin)
 ):
     return await create_user(db, payload)
 
 
 @router.get("/me", response_model=UserInDB)
-async def get_me(current_user: User = Depends(get_current_user)):
+async def get_me(current_user: User = Depends(require_admin)):
     return current_user
 
 
@@ -34,7 +35,7 @@ async def list_users(db: AsyncSession = Depends(get_pg_db), current_user: User =
 async def get_user_endpoint(
         user_id: int,
         db: AsyncSession = Depends(get_pg_db),
-        current_user: User = Depends(get_current_user)
+        current_user: User = Depends(require_admin)
 ):
     return await get_user(db, user_id)
 
@@ -43,7 +44,7 @@ async def get_user_endpoint(
 async def update_user_endpoint(
         user_id: int,
         user: UserUpdate,
-        current_user: User = Depends(get_current_user),
+        current_user: User = Depends(require_admin),
         db: AsyncSession = Depends(get_pg_db),
 ):
     updated_user = await update_user(db, user_id, user)
@@ -58,7 +59,7 @@ async def update_user_endpoint(
 async def patch_user_role(
         user_id: int = Path(..., ge=1),
         payload: UserRoleUpdate = Depends(),
-        current_user: User = Depends(get_current_user),
+        current_user: User = Depends(require_admin),
         db: AsyncSession = Depends(get_pg_db),
 ):
     check_assign_permission(payload.role, current_user)
@@ -68,7 +69,7 @@ async def patch_user_role(
 @router.delete("/delete/{user_id}", status_code=204)
 async def delete_user_endpoint(
         user_id: int,
-        current_user: User = Depends(get_current_user),
+        current_user: User = Depends(require_admin),
         db: AsyncSession = Depends(get_pg_db),
 ):
     await delete_user(db, user_id)

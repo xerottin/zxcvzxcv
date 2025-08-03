@@ -21,13 +21,13 @@ class Settings(BaseSettings):
     model_config = {
         "env_file": ".env",
         "case_sensitive": True,
-        "extra": "ignore"  # игнорировать дополнительные поля из .env
+        "extra": "ignore"
     }
 
     @field_validator('SECRET_KEY')
     @classmethod
     def secret_key_strength(cls, v: str) -> str:
-        if len(v) < 2:  # увеличил минимальную длину
+        if len(v) < 2:
             raise ValueError("SECRET_KEY must be at least 32 characters long")
         if v in ["supersecret", "secret", "changeme", "your-secret-key"]:
             raise ValueError("Please use a strong, unique SECRET_KEY")
@@ -40,7 +40,6 @@ class Settings(BaseSettings):
             raise ValueError("ALLOWED_HOSTS cannot be empty")
         for host in v:
             if "*" in host:
-                # Проверяем DEBUG через model_fields_set или используем другой подход
                 raise ValueError("Wildcard origins should be avoided")
         return v
 
@@ -66,10 +65,8 @@ class Settings(BaseSettings):
 
     @property
     def cors_origins(self) -> List[str]:
-        """Возвращает список разрешенных CORS origins"""
         if self.DEBUG:
-            return ["*"]  # В режиме отладки разрешаем все
+            return ["*"]  # Only in debug mode
         return self.ALLOWED_HOSTS
 
-# Создаем глобальный экземпляр настроек
 settings = Settings()
