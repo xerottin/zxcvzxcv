@@ -43,8 +43,7 @@ class Order(BaseModel):
 class OrderItem(BaseModel):
     __tablename__ = "order_item"
     order_id: Mapped[int] = mapped_column(ForeignKey("order.id"), nullable=False)
-    menu_item_id: Mapped[int] = mapped_column(ForeignKey("menu_item.id", ondelete="CASCADE"), nullable=False,
-                                              index=True)
+    menu_item_id: Mapped[int] = mapped_column(ForeignKey("menu_item.id", ondelete="CASCADE"), nullable=False, index=True)
     quantity: Mapped[int] = mapped_column(Integer, nullable=False)
     price: Mapped[int] = mapped_column(Integer, nullable=False)
     total_price: Mapped[int] = mapped_column(Integer, nullable=False)
