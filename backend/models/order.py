@@ -35,6 +35,8 @@ class Order(BaseModel):
     branch: Mapped["Branch"] = relationship("Branch", back_populates="order")
     user: Mapped["User"] = relationship("User", back_populates="order")
     order_item: Mapped["OrderItem"] = relationship("OrderItem", back_populates="order", cascade="all, delete-orphan")
+    payment: Mapped["Payment"] = relationship("Payment", back_populates="order", uselist=False)
+
 
     # def __repr__(self):
     #     return f"<Order(id={self.id}, user_id={self.user_id}, status={self.status.value})>"
