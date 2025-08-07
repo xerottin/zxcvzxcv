@@ -2,15 +2,14 @@ import logging
 from datetime import datetime
 from typing import Optional
 
-from fastapi import HTTPException
-from sqlalchemy import select, func
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
-
 from crud.basket import get_baskets
+from fastapi import HTTPException
 from models.order import Order, OrderItem, OrderStatus
 from schemas.order import OrderCreate, OrderUpdate
 from services.order import generate_order_id
+from sqlalchemy import select, func
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 logger = logging.getLogger(__name__)
 
@@ -18,18 +17,18 @@ logger = logging.getLogger(__name__)
 async def create_order(db: AsyncSession, payload: OrderCreate):
     try:
         logger.debug(f"Creating order with payload: {payload}")
-        
+
         user_baskets = await get_baskets(db, payload.user_id)
         if not user_baskets["baskets"]:
-            raise HTTPException(status_code=404, detail="No active baskets found for user")        
-        
-        order_id = generate_order_id() 
+            raise HTTPException(status_code=404, detail="No active baskets found for user")
+
+        order_id = generate_order_id()
         order = Order(
             username=order_id,
             special_instructions=payload.special_instructions,
             delivery_address=payload.delivery_address,
             user_id=payload.user_id,
-            branch_id= payload.branch_id,
+            branch_id=payload.branch_id,
             status=OrderStatus.PENDING,
             total_amount=user_baskets["total_count"]
         )
@@ -51,10 +50,10 @@ async def create_order(db: AsyncSession, payload: OrderCreate):
 
         await db.commit()
         await db.refresh(order)
-        
+
         logger.info(f"Order created with ID: {order.username}")
         return order
-        
+
     except HTTPException:
         await db.rollback()
         raise
@@ -71,7 +70,6 @@ async def get_orders(
         skip: int = 0,
         limit: int = 100
 ) -> dict:
-
     try:
         query = select(Order).options(
             selectinload(Order.order_item).selectinload(OrderItem.menu_item)
@@ -106,11 +104,10 @@ async def get_orders(
 
 
 async def get_order(db: AsyncSession, order_id: int, user_id: Optional[int] = None) -> Order:
-
     try:
         query = select(Order).options(
             selectinload(Order.order_item).selectinload(OrderItem.menu_item)
-        ).where(Order.id == order_id, Order.is_active ==True)
+        ).where(Order.id == order_id, Order.is_active == True)
 
         if user_id:
             query = query.where(Order.user_id == user_id)
@@ -133,7 +130,6 @@ async def get_order(db: AsyncSession, order_id: int, user_id: Optional[int] = No
 
 
 async def update_order(db: AsyncSession, order_id: int, data: OrderUpdate, user_id: Optional[int] = None) -> Order:
-
     try:
         query = select(Order).where(Order.id == order_id)
         if user_id:
@@ -197,8 +193,8 @@ def _is_valid_status_transition(current_status: OrderStatus, new_status: str) ->
 
     return new_status_enum in valid_transitions.get(current_status, [])
 
-async def delete_order(db: AsyncSession, order_id: int, user_id: int = None) -> dict:
 
+async def delete_order(db: AsyncSession, order_id: int, user_id: int = None) -> dict:
     try:
         query = select(Order).where(Order.id == order_id)
         if user_id:

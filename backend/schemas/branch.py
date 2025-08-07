@@ -1,7 +1,6 @@
+from datetime import datetime
 
 from pydantic import BaseModel
-
-from datetime import datetime
 
 
 class BranchBase(BaseModel):
@@ -15,13 +14,14 @@ class BranchBase(BaseModel):
     company_id: int | None = None
     owner_id: int | None = None
 
-
     model_config = {
         "from_attributes": True
     }
 
+
 class BranchCreate(BranchBase):
     pass
+
 
 class BranchInDb(BranchBase):
     id: int

@@ -1,16 +1,15 @@
-from datetime import datetime
-
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, update, delete as sql_delete
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import selectinload
-from fastapi import HTTPException, status
 import logging
-from typing import List, Optional
+from datetime import datetime
+from typing import List
 
-from models.menu import Menu
+from fastapi import HTTPException, status
 from models.branch import Branch
+from models.menu import Menu
 from schemas.menu import MenuCreate, MenuUpdate, MenuPatch
+from sqlalchemy import select, update
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 logger = logging.getLogger(__name__)
 
@@ -80,7 +79,6 @@ async def get_menu(db: AsyncSession, menu_id: int) -> Menu:
         menu = result.scalar_one_or_none()
 
         if not menu:
-
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"Menu with ID {menu_id} not found"

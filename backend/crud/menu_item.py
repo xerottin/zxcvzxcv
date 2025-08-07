@@ -1,14 +1,13 @@
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-from sqlalchemy.exc import IntegrityError
-from fastapi import HTTPException, status
-from typing import Optional
 import logging
+from typing import Optional
 
-from sqlalchemy.orm import selectinload
-
+from fastapi import HTTPException, status
 from models.menu import MenuItem, Menu
 from schemas.menu_item import MenuItemCreate, MenuItemUpdate
+from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 logger = logging.getLogger(__name__)
 

@@ -9,6 +9,10 @@ class Settings(BaseSettings):
     ASYNC_DATABASE_URL: str = Field(..., description="Async database URL")
     SYNC_DATABASE_URL: str = Field(..., description="Sync database URL")
 
+    # Celery
+    CELERY_BROKER_URL: str = "amqp://guest:guest@rabbitmq:5672//"
+    CELERY_RESULT_BACKEND: str = "rpc://"
+
     # Security
     SECRET_KEY: str = Field(..., min_length=1, description="Secret key for JWT")
     ALGORITHM: str = "HS256"
@@ -17,6 +21,7 @@ class Settings(BaseSettings):
     # CORS & Debug
     DEBUG: bool = False
     ALLOWED_HOSTS: List[str] = Field(default_factory=lambda: ["http://localhost:3000"])
+    API_BASE_URL: str = Field("http://localhost:8000", description="Base URL for the API")
 
     model_config = {
         "env_file": ".env",
@@ -68,5 +73,6 @@ class Settings(BaseSettings):
         if self.DEBUG:
             return ["*"]  # Only in debug mode
         return self.ALLOWED_HOSTS
+
 
 settings = Settings()

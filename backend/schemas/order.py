@@ -1,8 +1,7 @@
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict
-
 from models.order import OrderStatus
+from pydantic import BaseModel, ConfigDict
 from schemas.basket import MenuItemResponse
 
 

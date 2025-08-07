@@ -1,5 +1,5 @@
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from core.settings import settings
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
 engine = create_async_engine(
     settings.database_url,
@@ -14,6 +14,7 @@ async_session = async_sessionmaker(
     autoflush=False,
     autocommit=False,
 )
+
 
 async def get_pg_db():
     async with async_session() as session:

@@ -1,5 +1,7 @@
-from pydantic import BaseModel
 from datetime import datetime
+
+from pydantic import BaseModel
+
 
 class MenuCreate(BaseModel):
     username: str
@@ -7,6 +9,7 @@ class MenuCreate(BaseModel):
     logo: str | None = None
     description: str | None = None
     branch_id: int
+
 
 class MenuInDB(BaseModel):
     id: int
@@ -21,6 +24,7 @@ class MenuInDB(BaseModel):
         "from_attributes": True
     }
 
+
 class MenuResponse(BaseModel):
     id: int
     username: str
@@ -33,6 +37,8 @@ class MenuResponse(BaseModel):
     model_config = {
         "from_attributes": True
     }
+
+
 class MenuUpdate(BaseModel):
     username: str | None = None
     logo: str | None = None

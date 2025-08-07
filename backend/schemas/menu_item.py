@@ -1,5 +1,6 @@
-from pydantic import BaseModel, Field
 from datetime import datetime
+
+from pydantic import BaseModel
 
 
 class MenuItemCreate(BaseModel):
@@ -9,6 +10,7 @@ class MenuItemCreate(BaseModel):
     price: int
     is_available: bool = True
     menu_id: int
+
 
 class MenuItemResponse(BaseModel):
     id: int
@@ -24,8 +26,11 @@ class MenuItemResponse(BaseModel):
     model_config = {
         "from_attributes": True
     }
+
+
 class MenuItemInDB(MenuItemResponse):
     pass
+
 
 class MenuItemUpdate(BaseModel):
     username: str | None = None

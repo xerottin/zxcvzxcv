@@ -1,15 +1,15 @@
+from core.security import login_for_access_token
+from core.security import verify_password, create_access_token
+from db.session import get_pg_db
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
+from models import User
+from schemas.token import Token
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from db.session import get_pg_db
-from core.security import verify_password, create_access_token
-from models import User
-from core.security import login_for_access_token
-from schemas.token import Token
-
 router = APIRouter()
+
 
 @router.post("/login")
 async def login(form: OAuth2PasswordRequestForm = Depends(),
