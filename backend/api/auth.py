@@ -9,7 +9,7 @@ from models import User
 from core.security import login_for_access_token
 from schemas.token import Token
 
-router = APIRouter(prefix="", tags=["auth"])
+router = APIRouter()
 
 @router.post("/login")
 async def login(form: OAuth2PasswordRequestForm = Depends(),
