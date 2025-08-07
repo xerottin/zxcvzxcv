@@ -1,10 +1,9 @@
 from datetime import datetime
 
+from db.base import Base
 from sqlalchemy import Boolean, DateTime, Integer
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
-
-from db.base import Base
 
 
 class BaseModel(Base):

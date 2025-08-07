@@ -1,22 +1,21 @@
 import logging
-
 from typing import Optional
 
+from core.security import decode_access_token
+from db.session import get_pg_db
+from dependencies.permission import ASSIGN_RULES
 from fastapi import Depends, HTTPException, status, Security
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-
-from db.session import get_pg_db
-from dependencies.permission import ASSIGN_RULES
 from models import User
-from core.security import decode_access_token
 from models.user import UserRole
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
 logger = logging.getLogger(__name__)
+
 
 async def get_current_user(
         token: str = Depends(oauth2_scheme),
@@ -63,10 +62,13 @@ async def require_admin_or_company(current_user: User = Depends(get_current_user
     if current_user.role not in [UserRole.admin, UserRole.company]:
         raise HTTPException(status_code=403, detail="Admin or Company access required")
     return current_user
+
+
 async def require_branch(current_user: User = Depends(get_current_user)):
     if current_user.role != UserRole.branch:
         raise HTTPException(status_code=403, detail="Branch access required")
     return current_user
+
 
 def check_assign_permission(
         target_role: UserRole,

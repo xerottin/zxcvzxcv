@@ -1,11 +1,10 @@
 import enum
 from typing import List
 
+from models import BaseModel
 from sqlalchemy import Enum as SAEnum
 from sqlalchemy import String, Boolean
 from sqlalchemy.orm import relationship, Mapped, mapped_column
-
-from models import BaseModel
 
 
 class UserRole(enum.Enum):

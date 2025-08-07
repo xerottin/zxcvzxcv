@@ -1,10 +1,10 @@
 import logging
-from fastapi import HTTPException
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
+from fastapi import HTTPException
 from models import Branch
 from schemas.branch import BranchCreate
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 logger = logging.getLogger(__name__)
 

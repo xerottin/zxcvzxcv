@@ -1,7 +1,6 @@
+from models import BaseModel
 from sqlalchemy import String, Float, Integer, ForeignKey
 from sqlalchemy.orm import relationship, Mapped, mapped_column
-
-from models import BaseModel
 
 
 class Branch(BaseModel):

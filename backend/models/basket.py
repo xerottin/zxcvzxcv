@@ -1,14 +1,14 @@
+from models import BaseModel
 from sqlalchemy import ForeignKey, Integer, UniqueConstraint, CheckConstraint
 from sqlalchemy.orm import relationship, Mapped, mapped_column
-
-from models import BaseModel
 
 
 class Basket(BaseModel):
     __tablename__ = "basket"
 
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="CASCADE"), nullable=False, index=True)
-    menu_item_id: Mapped[int] = mapped_column(ForeignKey("menu_item.id", ondelete="CASCADE"), nullable=False, index=True)
+    menu_item_id: Mapped[int] = mapped_column(ForeignKey("menu_item.id", ondelete="CASCADE"), nullable=False,
+                                              index=True)
     quantity: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
 
     menu_item: Mapped["MenuItem"] = relationship("MenuItem", back_populates="basket")

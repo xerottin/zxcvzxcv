@@ -2,6 +2,7 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
+
 class CompanyCreate(BaseModel):
     username: str
     phone: str | None = None
@@ -10,6 +11,7 @@ class CompanyCreate(BaseModel):
     logo: str | None = None
     address: str | None = None
     owner_id: int
+
 
 class CompanyInDB(BaseModel):
     id: int
@@ -27,6 +29,7 @@ class CompanyInDB(BaseModel):
         "from_attributes": True
     }
 
+
 class CompanyUpdate(BaseModel):
     username: str | None = None
     phone: str | None = None
@@ -34,5 +37,3 @@ class CompanyUpdate(BaseModel):
     email: str | None = None
     logo: str | None = None
     address: str | None = None
-
-

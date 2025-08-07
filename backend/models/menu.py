@@ -1,9 +1,8 @@
 from typing import List
 
+from models import BaseModel
 from sqlalchemy import String, Integer, ForeignKey, Text, Boolean
 from sqlalchemy.orm import relationship, Mapped, mapped_column
-
-from models import BaseModel
 
 
 class Menu(BaseModel):

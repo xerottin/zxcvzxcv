@@ -1,5 +1,3 @@
-from fastapi import APIRouter, Depends, status, Query
-from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List, Optional
 
 from crud.menu import (
@@ -8,8 +6,10 @@ from crud.menu import (
 )
 from db.session import get_pg_db
 from dependencies.auth import require_branch
+from fastapi import APIRouter, Depends, status, Query
 from models import User
 from schemas.menu import MenuResponse, MenuCreate, MenuUpdate, MenuPatch
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="", tags=["Menus"])
 

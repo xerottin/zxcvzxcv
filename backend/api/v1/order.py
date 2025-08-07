@@ -1,17 +1,16 @@
 from typing import Optional
 
-from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import APIRouter, Depends, status, Query, HTTPException, Path, Body
-
 from crud.order import create_order, get_orders, get_order, update_order, delete_order
-from models.order import OrderStatus
-from schemas.order import OrderCreate, OrderUpdate, OrderResponse, OrdersResponse
-from dependencies.auth import get_current_user
-from models.user import User
 from db.session import get_pg_db
-
+from dependencies.auth import get_current_user
+from fastapi import APIRouter, Depends, status, Query, Path, Body
+from models.order import OrderStatus
+from models.user import User
+from schemas.order import OrderCreate, OrderUpdate, OrderResponse, OrdersResponse
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter()
+
 
 @router.post("/create", response_model=OrderResponse, status_code=status.HTTP_201_CREATED)
 async def create_order_endpoint(
@@ -31,7 +30,6 @@ async def get_orders_endpoint(
         db: AsyncSession = Depends(get_pg_db),
         current_user: User = Depends(get_current_user)
 ):
-
     return await get_orders(db, user_id, branch_id, skip, limit)
 
 
@@ -41,7 +39,6 @@ async def get_order_endpoint(
         db: AsyncSession = Depends(get_pg_db),
         current_user: User = Depends(get_current_user)
 ):
-
     return await get_order(db, order_id, current_user.id)
 
 
@@ -52,7 +49,6 @@ async def update_order_endpoint(
         db: AsyncSession = Depends(get_pg_db),
         current_user: User = Depends(get_current_user)
 ):
-
     return await update_order(db, order_id, payload, current_user.id)
 
 
@@ -62,5 +58,4 @@ async def delete_order_endpoint(
         db: AsyncSession = Depends(get_pg_db),
         current_user: User = Depends(get_current_user)
 ):
-
     return await delete_order(db, order_id, current_user.id)

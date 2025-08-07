@@ -1,14 +1,13 @@
-import re
 import logging
+import re
 from uuid import uuid4
 
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
 from fastapi import HTTPException
-
 from models import User
 from models.user import UserRole
 from schemas.user import UserCreate, UserUpdate
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 from utils.security import get_password_hash
 
 logger = logging.getLogger(__name__)

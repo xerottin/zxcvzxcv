@@ -1,10 +1,12 @@
-from pydantic import BaseModel, Field, ConfigDict
 from datetime import datetime
 from typing import List, Optional
 
+from pydantic import BaseModel, Field, ConfigDict
+
+
 class MenuItemResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-    
+
     id: int
     username: str
     logo: Optional[str] = None
@@ -28,7 +30,7 @@ class BasketUpdateSchema(BaseModel):
 
 class BasketResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-    
+
     id: int
     user_id: int
     menu_item_id: int

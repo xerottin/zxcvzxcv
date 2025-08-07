@@ -1,17 +1,18 @@
-from fastapi import FastAPI, Depends, HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import text
-from fastapi.middleware.cors import CORSMiddleware
-
-from core.settings import settings
-from db.session import get_pg_db
-from api import router as api_router
-
 import logging
 from contextlib import asynccontextmanager
 
+from fastapi import FastAPI, Depends, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from api import router as api_router
+from core.settings import settings
+from db.session import get_pg_db
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -20,6 +21,7 @@ async def lifespan(app: FastAPI):
     yield
     # Shutdown
     logger.info("Application shutting down...")
+
 
 app = FastAPI(
     title="Coffee-Shop-API",
@@ -31,8 +33,8 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], #settings.ALLOWED_HOSTS,
-    allow_credentials=True, #False
+    allow_origins=["*"],  # settings.ALLOWED_HOSTS,
+    allow_credentials=True,  # False
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
     allow_headers=["*"],
 )
@@ -44,6 +46,7 @@ app.include_router(api_router)
 async def ping(db: AsyncSession = Depends(get_pg_db)):
     await db.execute(text("SELECT 1"))
     return {"message": "pong"}
+
 
 @app.get("/health", include_in_schema=False, tags=["Health"])
 async def health_check(db: AsyncSession = Depends(get_pg_db)):

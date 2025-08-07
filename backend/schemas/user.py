@@ -1,11 +1,10 @@
 import re
-
+from datetime import datetime
 from typing import Optional, Self
 
-from pydantic import BaseModel, EmailStr, field_validator, model_validator
-from datetime import datetime
-
 from models.user import UserRole
+from pydantic import BaseModel, EmailStr, field_validator, model_validator
+
 
 class UserBase(BaseModel):
     username: str | None = None
@@ -23,6 +22,7 @@ class UserCreate(UserBase):
             raise ValueError('Password too short')
         return v
 
+
 class UserInDB(UserBase):
     id: int
     email: EmailStr
@@ -37,6 +37,7 @@ class UserInDB(UserBase):
         "use_enum_values": True
     }
 
+
 class UserResponse(UserBase):
     id: int
     email: EmailStr
@@ -46,10 +47,12 @@ class UserResponse(UserBase):
     created_at: datetime
     updated_at: datetime
 
+
 class UserUpdate(UserBase):
     passwrod: str | None = None
     phone: str | None = None
     is_verified: bool = False
+
 
 class UserRoleUpdate(UserBase):
     role: UserRole
@@ -64,10 +67,12 @@ class LoginRequest(BaseModel):
         if not self.email and not self.phone:
             raise ValueError('Either email or phone must be provided')
 
+
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     user: UserInDB
+
 
 class UserRegister(BaseModel):
     email: Optional[EmailStr] = None
@@ -98,6 +103,7 @@ class UserRegister(BaseModel):
             raise ValueError('Either email or phone must be provided')
         return self
 
+
 class VerifyCodeRequest(BaseModel):
     email: Optional[EmailStr] = None
     phone: Optional[str] = None
@@ -109,11 +115,13 @@ class VerifyCodeRequest(BaseModel):
             raise ValueError('Either email or phone must be provided')
         return self
 
+
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     user: "UserInDB"
 
+
 class CodeSentResponse(BaseModel):
     message: str
-    expires_in: int 
+    expires_in: int
