@@ -40,7 +40,6 @@ async def create_public_user(db: AsyncSession, data: UserRegister) -> User:
                 if existing_user.phone == data.phone:
                     raise HTTPException(status_code=409, detail="Phone number already registered")
 
-        # Генерация username
         if not data.username:
             if data.email:
                 base = re.split(r"@+", data.email)[0]
@@ -84,7 +83,6 @@ async def create_public_user(db: AsyncSession, data: UserRegister) -> User:
 
 async def create_public_user(db: AsyncSession, data: UserRegister) -> User:
     try:
-        # Проверка существующих пользователей
         conditions = []
         if data.email:
             conditions.append(User.email == data.email)
@@ -105,7 +103,6 @@ async def create_public_user(db: AsyncSession, data: UserRegister) -> User:
                 if data.phone and existing_user.phone == data.phone:
                     raise HTTPException(status_code=409, detail="Phone number already registered")
 
-        # Генерация username
         if not data.username:
             if data.email:
                 base = re.split(r"@+", data.email)[0]
@@ -116,7 +113,6 @@ async def create_public_user(db: AsyncSession, data: UserRegister) -> User:
         else:
             username = data.username
 
-        # Проверка уникальности username
         stmt = select(User).where(User.username == username)
         result = await db.execute(stmt)
         existing_username = result.scalar_one_or_none()
@@ -124,7 +120,6 @@ async def create_public_user(db: AsyncSession, data: UserRegister) -> User:
         if existing_username:
             username = f"{username}_{uuid4().hex[:4]}"
 
-        # Нормализация телефона
         normalized_phone = None
         if data.phone:
             normalized_phone = re.sub(r'[\s\-\(\)]', '', data.phone)
@@ -135,7 +130,7 @@ async def create_public_user(db: AsyncSession, data: UserRegister) -> User:
             phone=normalized_phone,
             hashed_password=get_password_hash(data.password),
             role=UserRole.user,
-            is_verified=False  # Пользователь не верифицирован при регистрации
+            is_verified=False
         )
 
         db.add(user)
@@ -160,7 +155,6 @@ async def generate_and_send_code(
     phone: Optional[str] = None
 ) -> str:
     try:
-        # Удаляем старые неиспользованные коды для этого пользователя
         conditions = []
         if email:
             conditions.append(VerificationCode.email == email)
