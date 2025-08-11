@@ -12,7 +12,7 @@ from models.user import UserRole
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
 logger = logging.getLogger(__name__)
 
@@ -63,6 +63,11 @@ async def require_admin_or_company(current_user: User = Depends(get_current_user
         raise HTTPException(status_code=403, detail="Admin or Company access required")
     return current_user
 
+
+async def require_company_or_branch(current_user: User = Depends(get_current_user)):
+    if current_user.role not in [UserRole.company, UserRole.branch]:
+        raise HTTPException(status_code=403, detail="Company or Branch access required")
+    return current_user
 
 async def require_branch(current_user: User = Depends(get_current_user)):
     if current_user.role != UserRole.branch:

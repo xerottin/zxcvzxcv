@@ -17,10 +17,10 @@ class UserRole(enum.Enum):
 class User(BaseModel):
     __tablename__ = 'user'
 
-    username: Mapped[str] = mapped_column(String(15), unique=True, nullable=False)
-    hashed_password: Mapped[str] = mapped_column(String(128), nullable=False)
+    username: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
+    hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
-    phone: Mapped[str] = mapped_column(String(15), nullable=True)
+    phone: Mapped[str] = mapped_column(String(255), nullable=True)
     is_verified: Mapped[bool] = mapped_column(Boolean, default=False)
     role: Mapped[UserRole] = mapped_column(
         SAEnum(UserRole, name="user_role", create_type=True),

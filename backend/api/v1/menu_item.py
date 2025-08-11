@@ -6,7 +6,7 @@ from models import User
 from schemas.menu_item import MenuItemCreate, MenuItemUpdate, MenuItemResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-router = APIRouter(prefix="", tags=["Menu-Item"])
+router = APIRouter()
 
 
 @router.post("/create", response_model=MenuItemResponse, status_code=status.HTTP_201_CREATED)

@@ -8,7 +8,7 @@ from sqlalchemy.orm import relationship, Mapped, mapped_column
 class Menu(BaseModel):
     __tablename__ = "menu"
 
-    username: Mapped[str] = mapped_column(String(15), unique=True, nullable=False)
+    username: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     logo: Mapped[str] = mapped_column(String(255), nullable=True)
     description: Mapped[str] = mapped_column(Text, nullable=True)
     branch_id: Mapped[int] = mapped_column(Integer, ForeignKey('branch.id'), nullable=False)
@@ -20,7 +20,7 @@ class Menu(BaseModel):
 class MenuItem(BaseModel):
     __tablename__ = "menu_item"
 
-    username: Mapped[str] = mapped_column(String(15), unique=True, nullable=False)
+    username: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     logo: Mapped[str] = mapped_column(String(255), nullable=True)
     description: Mapped[str] = mapped_column(Text, nullable=True)
     price: Mapped[int] = mapped_column(Integer, nullable=True)

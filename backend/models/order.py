@@ -19,7 +19,7 @@ class OrderStatus(enum.Enum):
 
 class Order(BaseModel):
     __tablename__ = "order"
-    username: Mapped[str] = mapped_column(String(15), unique=True, nullable=False)
+    username: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     branch_id: Mapped[int] = mapped_column(ForeignKey("branch.id"), nullable=False)
     special_instructions: Mapped[str] = mapped_column(String(500), nullable=True)
     delivery_address: Mapped[str] = mapped_column(String(255), nullable=True)

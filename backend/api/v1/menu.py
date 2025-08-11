@@ -5,20 +5,20 @@ from crud.menu import (
     update_menu, patch_menu, delete_menu, get_menus_paginated
 )
 from db.session import get_pg_db
-from dependencies.auth import require_branch
+from dependencies.auth import require_company_or_branch
 from fastapi import APIRouter, Depends, status, Query
 from models import User
 from schemas.menu import MenuResponse, MenuCreate, MenuUpdate, MenuPatch
 from sqlalchemy.ext.asyncio import AsyncSession
 
-router = APIRouter(prefix="", tags=["Menus"])
+router = APIRouter()
 
 
 @router.post("/", response_model=MenuResponse, status_code=status.HTTP_201_CREATED)
 async def create_menu_endpoint(
         data: MenuCreate,
         db: AsyncSession = Depends(get_pg_db),
-        current_user: User = Depends(require_branch)
+        current_user: User = Depends(require_company_or_branch)
 ):
     return await create_menu(db, data)
 
@@ -29,7 +29,7 @@ async def get_menus_endpoint(
         skip: int = Query(0, ge=0, description="Number of records to skip"),
         limit: int = Query(100, ge=1, le=1000, description="Number of records to return"),
         db: AsyncSession = Depends(get_pg_db),
-        current_user: User = Depends(require_branch)
+        current_user: User = Depends(require_company_or_branch)
 ):
     if branch_id:
         return await get_menu_by_branch(db, branch_id)
@@ -40,7 +40,7 @@ async def get_menus_endpoint(
 async def get_menu_endpoint(
         menu_id: int,
         db: AsyncSession = Depends(get_pg_db),
-        current_user: User = Depends(require_branch)
+        current_user: User = Depends(require_company_or_branch)
 ):
     return await get_menu(db, menu_id)
 
@@ -50,7 +50,7 @@ async def update_menu_endpoint(
         menu_id: int,
         data: MenuUpdate,
         db: AsyncSession = Depends(get_pg_db),
-        current_user: User = Depends(require_branch)
+        current_user: User = Depends(require_company_or_branch)
 ):
     return await update_menu(db, menu_id, data)
 
@@ -60,7 +60,7 @@ async def patch_menu_endpoint(
         menu_id: int,
         data: MenuPatch,
         db: AsyncSession = Depends(get_pg_db),
-        current_user: User = Depends(require_branch)
+        current_user: User = Depends(require_company_or_branch)
 ):
     return await patch_menu(db, menu_id, data)
 
@@ -69,7 +69,7 @@ async def patch_menu_endpoint(
 async def delete_menu_endpoint(
         menu_id: int,
         db: AsyncSession = Depends(get_pg_db),
-        current_user: User = Depends(require_branch)
+        current_user: User = Depends(require_company_or_branch)
 ):
     await delete_menu(db, menu_id)
     return None

@@ -7,7 +7,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 
 class VerificationCode(BaseModel):
-    __tablename__ = "verification_codes"
+    __tablename__ = "verification_code"
 
     email: Mapped[Optional[str]] = mapped_column(String(255), nullable=True, index=True)
     phone: Mapped[Optional[str]] = mapped_column(String(20), nullable=True, index=True)

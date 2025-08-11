@@ -6,8 +6,8 @@ from sqlalchemy.orm import relationship, Mapped, mapped_column
 class Branch(BaseModel):
     __tablename__ = "branch"
 
-    username: Mapped[str] = mapped_column(String(15), unique=True, nullable=False)
-    phone: Mapped[str] = mapped_column(String(15))
+    username: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
+    phone: Mapped[str] = mapped_column(String(255))
     url: Mapped[str] = mapped_column(String(255))
     latitude: Mapped[float] = mapped_column(Float)
     longitude: Mapped[float] = mapped_column(Float)
