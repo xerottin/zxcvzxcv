@@ -2,8 +2,8 @@ import logging
 from datetime import datetime, timedelta
 from typing import Any, Optional
 
+from dependencies.auth import get_by_username
 from core.settings import settings
-from crud.user import get_by_username
 from db.session import get_pg_db
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
