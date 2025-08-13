@@ -175,6 +175,7 @@ async def verify_code(
 
 async def send_email_code(email: str, code: str):
     logger.info(f"Sending email code {code} to {email}")
+    # Integrate with email service here
     pass
 
 

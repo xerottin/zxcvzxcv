@@ -51,15 +51,6 @@ async def get_current_user(
 
     return user
 
-async def get_by_username(db: AsyncSession, username: str):
-    # result = await db.execute(select(User).where((User.username == username) & (User.is_active == True)))
-    result = await db.execute(select(User).where(User.username == username, User.is_active == True))
-    user = result.scalars().first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    return user
-
-
 async def require_admin(current_user: User = Depends(get_current_user)):
     if current_user.role != UserRole.admin:
         raise HTTPException(status_code=403, detail="Admin access required")

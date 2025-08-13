@@ -2,7 +2,6 @@ import logging
 from datetime import datetime, timedelta
 from typing import Any, Optional
 
-from dependencies.auth import get_by_username
 from core.settings import settings
 from db.session import get_pg_db
 from fastapi import Depends, HTTPException, status
@@ -51,6 +50,7 @@ def decode_access_token(token: str) -> dict[str, Any]:
 
 
 async def authenticate_user(db: AsyncSession, username: str, password: str):
+    from crud.user import get_by_username
     user = await get_by_username(db, username)
     if not user:
         logger.warning(f"Failed login attempt for username: {username}")

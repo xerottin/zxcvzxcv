@@ -5,7 +5,7 @@ from db.session import get_pg_db
 from fastapi import APIRouter, Depends, HTTPException, status
 from models.user import User
 from schemas.user import CodeSentResponse, LoginRequest, TokenResponse, UserInDB, UserRegister, VerifyCodeRequest
-from services.authorization import create_public_user, generate_and_send_code, verify_code
+from crud.authorization import create_public_user, generate_and_send_code, verify_code
 from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
