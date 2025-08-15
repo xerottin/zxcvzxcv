@@ -33,7 +33,7 @@ Core functionality:
 | **PostgreSQL**           | Database                     |
 | **SQLAlchemy + Alembic** | ORM + migrations             |
 | **Celery + Rabbitmq**    | Tasks                        |
-| **Redis**                | Caching and background tasks |
+| **Redis**                | Caching                      |
 | **Docker & Compose**     | Containerization             |
 | **Gunicorn + Uvicorn**   | Application server           |
 
