@@ -32,6 +32,7 @@ Core functionality:
 | **FastAPI**              | REST API framework           |
 | **PostgreSQL**           | Database                     |
 | **SQLAlchemy + Alembic** | ORM + migrations             |
+| **Celery + Rabbitmq**    | Tasks                        |
 | **Redis**                | Caching and background tasks |
 | **Docker & Compose**     | Containerization             |
 | **Gunicorn + Uvicorn**   | Application server           |
