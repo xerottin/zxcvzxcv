@@ -1,0 +1,144 @@
+services:
+  fastapi:
+    container_name: zxczcx_fastapi
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: always
+    env_file:
+      - ./backend/.env
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      # mongo:
+      #   condition: service_healthy
+      # redis:
+      #   condition: service_healthy
+    command: bash -c "alembic upgrade head && gunicorn -b 0.0.0.0:8000  -w 1 -t 120 -k uvicorn.workers.UvicornWorker main:app --max-requests 1000 --max-requests-jitter 100 --access-logfile -"
+    #use websocket for future websocket support
+    networks:
+      - zxczcx_network
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 512M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # websocket:
+  #   container_name: zxczcx_websocket
+  #   build:
+  #     context: ./websocket
+  #     dockerfile: Dockerfile
+  #   restart: always
+  #   env_file:
+  #     - ./backend/.env
+  #   ports:
+  #     - "9000:9000"
+  #   networks:
+  #     - zxczcx_network
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         cpus: "0.25"
+  #         memory: 256M
+  #   logging:
+  #     driver: json-file
+  #     options:
+  #       max-size: "5m"
+  #       max-file: "2"
+
+  postgres:
+    image: postgres:16
+    container_name: zxczcx_postgres_db
+    restart: always
+    env_file:
+      - ./backend/.env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - zxczcx_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 512M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+
+  # mongo:
+  #   image: mongo:7
+  #   container_name: zxczcx_mongo_db
+  #   restart: always
+  #   volumes:
+  #     - mongo_data:/data/db
+  #   ports:
+  #     - "27017:27017"
+  #   networks:
+  #     - zxczcx_network
+  #   healthcheck:
+  #     test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         cpus: "0.50"
+  #         memory: 512M
+  #   logging:
+  #     driver: json-file
+  #     options:
+  #       max-size: "10m"
+  #       max-file: "3"
+
+  # redis:
+  #   image: redis:7
+  #   container_name: zxczcx_redis_cache
+  #   restart: always
+  #   ports:
+  #     - "6379:6379"
+  #   networks:
+  #     - zxczcx_network
+  #   healthcheck:
+  #     test: ["CMD", "redis-cli", "ping"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         cpus: "0.25"
+  #         memory: 256M
+  #   logging:
+  #     driver: json-file
+  #     options:
+  #       max-size: "5m"
+  #       max-file: "2"
+
+volumes:
+  postgres_data:
+  # mongo_data:
+  # redis_data:
+
+networks:
+  zxczcx_network:
+    name: zxczcx_network
+    external: true
