@@ -3,13 +3,13 @@
 ## 📌 Description
 
 **Delivery Service API** is a backend service designed to automate delivery operations.  
-Core logic:
+Main Functionality:
 
 1. **Companies** — create and manage companies.
 2. **Branches** — each branch is linked to a company and has its own product list.
 3. **Products** — add, edit, and delete products.
 4. **Orders** — users can place orders for products from branches.
-5. **Automatic User Cleanup** — if a user hasn’t logged in for more than **2 days**, the system removes them.
+5. **Automatic Removal of Inactive Users** — if a user hasn’t logged in for more than **2 days**, the system removes them.
 
 ---
 
