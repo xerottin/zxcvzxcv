@@ -8,7 +8,7 @@ from models.user import UserRole
 from schemas.user import UserCreate, UserUpdate
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from utils.security import get_password_hash
+from core.security import get_password_hash
 
 logger = logging.getLogger(__name__)
 

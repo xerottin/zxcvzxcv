@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime, timedelta, timezone
+from utils.log import timeit
 
 from db.session import get_pg_db
 from dependencies.auth import require_admin
@@ -18,6 +19,7 @@ router = APIRouter()
 
 
 @router.get("/stats", response_model=CleanupStats)
+@timeit
 async def get_cleanup_stats(
         days_threshold: int = 7,
         db: AsyncSession = Depends(get_pg_db),
@@ -82,6 +84,7 @@ async def get_cleanup_stats(
 
 
 @router.post("/execute", response_model=CleanupResponse)
+@timeit
 async def execute_cleanup(
         payload: CleanupRequest,
         db: AsyncSession = Depends(get_pg_db),
