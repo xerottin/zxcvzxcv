@@ -5,7 +5,7 @@ from crud.menu import (
     update_menu, patch_menu, delete_menu, get_menus_paginated
 )
 from db.session import get_pg_db
-from dependencies.auth import require_company_or_branch
+from dependencies.auth import get_current_user, require_company_or_branch
 from fastapi import APIRouter, Depends, status, Query
 from models import User
 from schemas.menu import MenuResponse, MenuCreate, MenuUpdate, MenuPatch
@@ -40,7 +40,7 @@ async def get_menus_endpoint(
 async def get_menu_endpoint(
         menu_id: int,
         db: AsyncSession = Depends(get_pg_db),
-        current_user: User = Depends(require_company_or_branch)
+        current_user: User = Depends(get_current_user)
 ):
     return await get_menu(db, menu_id)
 

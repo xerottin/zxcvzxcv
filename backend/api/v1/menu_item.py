@@ -1,6 +1,6 @@
 from crud.menu_item import create_menu_item, get_menu_item, update_menu_item, patch_menu_item, delete_menu_item
 from db.session import get_pg_db
-from dependencies.auth import require_branch
+from dependencies.auth import get_current_user, require_branch
 from fastapi import APIRouter, Depends, status
 from models import User
 from schemas.menu_item import MenuItemCreate, MenuItemUpdate, MenuItemResponse
@@ -22,7 +22,7 @@ async def create_menu_item_endpoint(
 async def get_menu_item_endpoint(
         menu_item_id: int,
         db: AsyncSession = Depends(get_pg_db),
-        current_user: User = Depends(require_branch)
+        current_user: User = Depends(get_current_user)
 ):
     return await get_menu_item(db, menu_item_id)
 
