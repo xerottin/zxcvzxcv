@@ -9,7 +9,8 @@ Core functionality:
 2. **Branches** — each branch is linked to a company and has its own product list.
 3. **Products** — add, edit, and delete products.
 4. **Orders** — users can place orders for products from branches.
-5. **Automatic User Cleanup** — if a user hasn’t logged in for more than **2 days**, the system removes them.
+5. **Users** — create user
+6. **Automatic User Cleanup** — if a user hasn’t logged in for more than **2 days**, the system removes them.
 
 ---
 
@@ -44,7 +45,7 @@ Core functionality:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/xerottin/cafeteria.git
+git clone https://github.com/xerottin/zxcvzxcv.git
 ```
 
 ### 2. Ensure Docker is Installed
@@ -54,7 +55,7 @@ Install Docker from the official site if necessary: [Docker](https://www.docker.
 ### 3. Create a Docker Network
 
 ```bash
-docker network create cafeteria-network
+docker network create zxczcx_network
 ```
 
 ### 4. Build and Run Docker Containers
@@ -77,4 +78,3 @@ Your local development environment is now ready!
 You can customize the Docker setup and database configurations as needed.
 
 ---
-

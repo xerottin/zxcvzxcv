@@ -6,7 +6,6 @@ from pydantic import BaseModel
 class MenuCreate(BaseModel):
     username: str
     logo: str | None = None
-    logo: str | None = None
     description: str | None = None
     branch_id: int
 

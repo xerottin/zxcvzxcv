@@ -49,7 +49,7 @@ class UserResponse(UserBase):
 
 
 class UserUpdate(UserBase):
-    passwrod: str | None = None
+    password: str | None = None
     phone: str | None = None
     is_verified: bool = False
 
