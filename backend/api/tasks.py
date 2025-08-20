@@ -24,9 +24,11 @@ async def get_cleanup_stats(
         # current_user: User = Depends(require_admin)
 ):
     try:
-        cutoff_date = datetime.now(timezone.utc) - timedelta(days=days_threshold)
+        cutoff_date = datetime.now(timezone.utc) - \
+            timedelta(days=days_threshold)
 
-        total_users_stmt = select(func.count(User.id)).where(User.is_active == True)
+        total_users_stmt = select(func.count(
+            User.id)).where(User.is_active == True)
         verified_users_stmt = select(func.count(User.id)).where(
             and_(User.is_active == True, User.is_verified == True)
         )
@@ -78,14 +80,15 @@ async def get_cleanup_stats(
 
     except Exception as e:
         logger.error(f"Error getting cleanup stats: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail="Failed to get cleanup statistics")
+        raise HTTPException(
+            status_code=500, detail="Failed to get cleanup statistics")
 
 
 @router.post("/execute", response_model=CleanupResponse, include_in_schema=True)
 async def execute_cleanup(
         payload: CleanupRequest,
         db: AsyncSession = Depends(get_pg_db),
-        
+
         # current_user: User = Depends(require_admin)
 ):
     start_time = datetime.now(timezone.utc)

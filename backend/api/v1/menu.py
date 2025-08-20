@@ -25,9 +25,11 @@ async def create_menu_endpoint(
 
 @router.get("/", response_model=List[MenuResponse])
 async def get_menus_endpoint(
-        branch_id: Optional[int] = Query(None, description="Filter by branch ID"),
+        branch_id: Optional[int] = Query(
+            None, description="Filter by branch ID"),
         skip: int = Query(0, ge=0, description="Number of records to skip"),
-        limit: int = Query(100, ge=1, le=1000, description="Number of records to return"),
+        limit: int = Query(100, ge=1, le=1000,
+                           description="Number of records to return"),
         db: AsyncSession = Depends(get_pg_db),
         current_user: User = Depends(require_company_or_branch)
 ):

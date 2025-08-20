@@ -229,7 +229,8 @@ async def patch_menu(db: AsyncSession, menu_id: int, data: MenuPatch) -> Menu:
             return menu
 
         if 'branch_id' in update_data:
-            branch_query = select(Branch).where(Branch.id == update_data['branch_id'])
+            branch_query = select(Branch).where(
+                Branch.id == update_data['branch_id'])
             branch_result = await db.execute(branch_query)
             branch = branch_result.scalar_one_or_none()
 
@@ -255,7 +256,8 @@ async def patch_menu(db: AsyncSession, menu_id: int, data: MenuPatch) -> Menu:
 
         await db.refresh(updated_menu)
 
-        logger.info(f"Menu {menu_id} patched successfully. Updated fields: {list(update_data.keys())}")
+        logger.info(
+            f"Menu {menu_id} patched successfully. Updated fields: {list(update_data.keys())}")
         return updated_menu
 
     except HTTPException:
@@ -307,7 +309,8 @@ async def patch_menu(db: AsyncSession, menu_id: int, data: MenuPatch) -> Menu:
 
     except Exception as e:
         await db.rollback()
-        logger.error(f"Unexpected error patching menu {menu_id}: {str(e)}", exc_info=True)
+        logger.error(
+            f"Unexpected error patching menu {menu_id}: {str(e)}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An unexpected error occurred while updating the menu"

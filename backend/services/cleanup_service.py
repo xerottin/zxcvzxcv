@@ -15,9 +15,11 @@ async def _cleanup_unverified_users_api(db: AsyncSession, payload: CleanupReques
     processed_users = []
 
     try:
-        cutoff_date = datetime.now(timezone.utc) - timedelta(days=payload.days_threshold)
+        cutoff_date = datetime.now(timezone.utc) - \
+            timedelta(days=payload.days_threshold)
 
-        logger.info(f"Starting cleanup of users created before {cutoff_date} (dry_run: {payload.dry_run})")
+        logger.info(
+            f"Starting cleanup of users created before {cutoff_date} (dry_run: {payload.dry_run})")
 
         stmt = select(User).where(
             and_(
@@ -30,7 +32,8 @@ async def _cleanup_unverified_users_api(db: AsyncSession, payload: CleanupReques
         result = await db.execute(stmt)
         users_to_delete = result.scalars().all()
 
-        logger.info(f"Found {len(users_to_delete)} unverified users to process")
+        logger.info(
+            f"Found {len(users_to_delete)} unverified users to process")
 
         for user in users_to_delete:
             user_info = {
@@ -44,7 +47,8 @@ async def _cleanup_unverified_users_api(db: AsyncSession, payload: CleanupReques
             processed_users.append(user_info)
 
             if not payload.dry_run:
-                logger.info(f"Deleting unverified user: {user.id}, email: {user.email}")
+                logger.info(
+                    f"Deleting unverified user: {user.id}, email: {user.email}")
 
                 codes_stmt = delete(VerificationCode).where(
                     or_(

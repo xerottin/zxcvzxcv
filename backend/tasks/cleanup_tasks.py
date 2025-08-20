@@ -68,6 +68,7 @@ def weekly_comprehensive_cleanup(self):
         force=True
     )
 
+
 @current_app.task(bind=True, max_retries=3)
 def cleanup_expired_codes(self):
     return cleanup_via_api(

@@ -34,16 +34,19 @@ async def create_public_user(db: AsyncSession, data: UserRegister) -> User:
             )
             if existing_user:
                 if existing_user.email == data.email:
-                    raise HTTPException(status_code=409, detail="Email already registered")
+                    raise HTTPException(
+                        status_code=409, detail="Email already registered")
                 if existing_user.phone == data.phone:
-                    raise HTTPException(status_code=409, detail="Phone number already registered")
+                    raise HTTPException(
+                        status_code=409, detail="Phone number already registered")
 
         if not data.username:
             if data.email:
                 base = re.split(r"@+", data.email)[0]
                 base = re.sub(r"\W+", "", base) or "user"
             elif data.phone:
-                base = f"user{data.phone[-4:]}" if len(data.phone) >= 4 else "user"
+                base = f"user{data.phone[-4:]}" if len(
+                    data.phone) >= 4 else "user"
             username = f"{base}_{uuid4().hex[:6]}"
         else:
             username = data.username
@@ -76,9 +79,9 @@ async def create_public_user(db: AsyncSession, data: UserRegister) -> User:
         raise
     except Exception as e:
         await db.rollback()
-        logger.error(f"Unexpected error in create_public_user: {e}", exc_info=True)
+        logger.error(
+            f"Unexpected error in create_public_user: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Internal server error")
-
 
 
 def generate_verification_code(length: int = 6) -> str:
@@ -132,7 +135,8 @@ async def generate_and_send_code(
     except Exception as e:
         await db.rollback()
         logger.error(f"Error generating verification code: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail="Failed to send verification code")
+        raise HTTPException(
+            status_code=500, detail="Failed to send verification code")
 
 
 async def verify_code(

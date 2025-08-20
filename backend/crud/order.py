@@ -20,7 +20,8 @@ async def create_order(db: AsyncSession, payload: OrderCreate):
 
         user_baskets = await get_baskets(db, payload.user_id)
         if not user_baskets["baskets"]:
-            raise HTTPException(status_code=404, detail="No active baskets found for user")
+            raise HTTPException(
+                status_code=404, detail="No active baskets found for user")
 
         order_id = generate_order_id()
         order = Order(
@@ -80,7 +81,8 @@ async def get_orders(
         if branch_id:
             query = query.where(Order.branch_id == branch_id)
 
-        query = query.order_by(Order.created_at.desc()).offset(skip).limit(limit)
+        query = query.order_by(Order.created_at.desc()
+                               ).offset(skip).limit(limit)
 
         count_query = select(func.count(Order.id))
         if user_id:

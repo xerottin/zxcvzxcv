@@ -21,7 +21,8 @@ async def create_user(db: AsyncSession, data: UserCreate) -> User:
             )
         )
         if existing_user:
-            raise HTTPException(status_code=409, detail="Email already registered")
+            raise HTTPException(
+                status_code=409, detail="Email already registered")
 
         if not data.username:
             base = re.split(r"@+", data.email)[0]
