@@ -26,14 +26,9 @@ def get_password_hash(password: str) -> str:
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/token")
 
 
-def create_access_token(
-        data: dict[str, Any],
-        expires_delta: Optional[timedelta] = None
-) -> str:
+def create_access_token(data: dict[str, Any], expires_delta: Optional[timedelta] = None) -> str:
     to_encode = data.copy()
-    expire = datetime.utcnow() + (expires_delta or timedelta(
-        minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
-    ))
+    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES))
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
@@ -51,6 +46,7 @@ def decode_access_token(token: str) -> dict[str, Any]:
 
 async def authenticate_user(db: AsyncSession, username: str, password: str):
     from crud.user import get_by_username
+
     user = await get_by_username(db, username)
     if not user:
         logger.warning(f"Failed login attempt for username: {username}")
@@ -63,8 +59,7 @@ async def authenticate_user(db: AsyncSession, username: str, password: str):
 
 
 async def login_for_access_token(
-        form_data: OAuth2PasswordRequestForm = Depends(),
-        db: AsyncSession = Depends(get_pg_db)
+    form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_pg_db)
 ) -> dict[str, Any]:
     user = await authenticate_user(db, form_data.username, form_data.password)
     if not user:
@@ -73,8 +68,5 @@ async def login_for_access_token(
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    token = create_access_token({
-        "sub": str(user.id),
-        "role": user.role.value
-    })
+    token = create_access_token({"sub": str(user.id), "role": user.role.value})
     return {"access_token": token, "token_type": "bearer"}

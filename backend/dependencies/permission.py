@@ -1,5 +1,4 @@
 from fastapi import HTTPException, status
-
 from models import User
 from models.user import UserRole
 
@@ -11,8 +10,8 @@ ASSIGN_RULES: dict[UserRole, set[UserRole]] = {
 
 
 def check_assign_permission(
-        new_role: UserRole,
-        current: User,
+    new_role: UserRole,
+    current: User,
 ) -> None:
     allowed = ASSIGN_RULES.get(current.role, set())
     if new_role not in allowed:

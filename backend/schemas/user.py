@@ -15,11 +15,11 @@ class UserCreate(UserBase):
     email: EmailStr
     role: UserRole = UserRole.user
 
-    @field_validator('password')
+    @field_validator("password")
     @classmethod
     def validate_password(cls, v):
         if len(v) < 2:
-            raise ValueError('Password too short')
+            raise ValueError("Password too short")
         return v
 
 
@@ -32,10 +32,7 @@ class UserInDB(UserBase):
     created_at: datetime
     updated_at: datetime
 
-    model_config = {
-        "from_attributes": True,
-        "use_enum_values": True
-    }
+    model_config = {"from_attributes": True, "use_enum_values": True}
 
 
 class UserResponse(UserBase):
@@ -65,7 +62,7 @@ class LoginRequest(BaseModel):
 
     def model_post_init(self, __context):
         if not self.email and not self.phone:
-            raise ValueError('Either email or phone must be provided')
+            raise ValueError("Either email or phone must be provided")
 
 
 class TokenResponse(BaseModel):
@@ -80,27 +77,27 @@ class UserRegister(BaseModel):
     password: str
     username: Optional[str] = None
 
-    @field_validator('password')
+    @field_validator("password")
     @classmethod
     def validate_password(cls, v: str) -> str:
         if len(v) < 2:
-            raise ValueError('Password too short')
+            raise ValueError("Password too short")
         return v
 
-    @field_validator('phone')
+    @field_validator("phone")
     @classmethod
     def validate_phone(cls, v: Optional[str]) -> Optional[str]:
         if v is None:
             return v
-        phone_pattern = r'^\+?[\d\s\-\(\)]{10,15}$'
-        if not re.match(phone_pattern, v.replace(' ', '').replace('-', '')):
-            raise ValueError('Invalid phone number format')
+        phone_pattern = r"^\+?[\d\s\-\(\)]{10,15}$"
+        if not re.match(phone_pattern, v.replace(" ", "").replace("-", "")):
+            raise ValueError("Invalid phone number format")
         return v
 
-    @model_validator(mode='after')
+    @model_validator(mode="after")
     def validate_contact_info(self) -> Self:
         if not self.email and not self.phone:
-            raise ValueError('Either email or phone must be provided')
+            raise ValueError("Either email or phone must be provided")
         return self
 
 
@@ -109,10 +106,10 @@ class VerifyCodeRequest(BaseModel):
     phone: Optional[str] = None
     code: str
 
-    @model_validator(mode='after')
+    @model_validator(mode="after")
     def validate_contact_info(self) -> Self:
         if not self.email and not self.phone:
-            raise ValueError('Either email or phone must be provided')
+            raise ValueError("Either email or phone must be provided")
         return self
 
 
