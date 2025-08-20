@@ -13,6 +13,9 @@ class VerificationCode(BaseModel):
     phone: Mapped[Optional[str]] = mapped_column(String(20), nullable=True, index=True)
     code: Mapped[str] = mapped_column(String(10), nullable=False, index=True)
     expires_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
     )
     is_used: Mapped[bool] = mapped_column(Boolean, default=False)

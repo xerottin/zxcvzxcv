@@ -5,16 +5,20 @@ from models.basket import Basket
 from models.menu import MenuItem
 from models.user import User
 from schemas.basket import BasketCreateSchema, BasketUpdateSchema
-from sqlalchemy import select, and_, func, delete
+from sqlalchemy import and_, delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 logger = logging.getLogger(__name__)
 
 
-async def create_basket(db: AsyncSession, data: BasketCreateSchema, user_id: int) -> Basket:
+async def create_basket(
+    db: AsyncSession, data: BasketCreateSchema, user_id: int
+) -> Basket:
     try:
-        menu_item = await db.scalar(select(MenuItem).where(MenuItem.id == data.menu_item_id))
+        menu_item = await db.scalar(
+            select(MenuItem).where(MenuItem.id == data.menu_item_id)
+        )
         if not menu_item:
             raise HTTPException(status_code=404, detail="Menu item not found")
 
@@ -23,8 +27,7 @@ async def create_basket(db: AsyncSession, data: BasketCreateSchema, user_id: int
             .options(selectinload(Basket.menu_item))
             .where(
                 and_(
-                    Basket.user_id == user_id,
-                    Basket.menu_item_id == data.menu_item_id
+                    Basket.user_id == user_id, Basket.menu_item_id == data.menu_item_id
                 )
             )
         )
@@ -36,7 +39,7 @@ async def create_basket(db: AsyncSession, data: BasketCreateSchema, user_id: int
             return existing_basket
 
         basket_data = data.dict(exclude_unset=True)
-        basket_data['user_id'] = user_id
+        basket_data["user_id"] = user_id
         basket = Basket(**basket_data)
 
         db.add(basket)
@@ -70,8 +73,7 @@ async def get_basket(db: AsyncSession, basket_id: int) -> Basket:
         basket = result.scalars().first()
 
         if not basket:
-            raise HTTPException(
-                status_code=404, detail="Basket item not found")
+            raise HTTPException(status_code=404, detail="Basket item not found")
 
         return basket
 
@@ -82,7 +84,9 @@ async def get_basket(db: AsyncSession, basket_id: int) -> Basket:
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
-async def get_baskets(db: AsyncSession, user_id: int, skip: int = 0, limit: int = 100) -> dict:
+async def get_baskets(
+    db: AsyncSession, user_id: int, skip: int = 0, limit: int = 100
+) -> dict:
     try:
         result = await db.execute(
             select(Basket)
@@ -100,17 +104,16 @@ async def get_baskets(db: AsyncSession, user_id: int, skip: int = 0, limit: int 
             if basket.menu_item and basket.menu_item.price:
                 total_count += basket.menu_item.price * basket.quantity
 
-        return {
-            "baskets": baskets,
-            "total_count": total_count
-        }
+        return {"baskets": baskets, "total_count": total_count}
 
     except Exception as e:
         logger.error(f"Error getting user baskets: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
-async def update_basket(db: AsyncSession, basket_id: int, data: BasketUpdateSchema, user_id: int) -> Basket:
+async def update_basket(
+    db: AsyncSession, basket_id: int, data: BasketUpdateSchema, user_id: int
+) -> Basket:
     try:
         basket = await db.scalar(
             select(Basket)
@@ -118,31 +121,32 @@ async def update_basket(db: AsyncSession, basket_id: int, data: BasketUpdateSche
             .where(Basket.id == basket_id)
         )
         if not basket:
-            raise HTTPException(
-                status_code=404, detail="Basket item not found")
+            raise HTTPException(status_code=404, detail="Basket item not found")
 
         if basket.user_id != user_id:
             raise HTTPException(status_code=403, detail="Access denied")
 
         if data.menu_item_id != basket.menu_item_id:
-            menu_item = await db.scalar(select(MenuItem).where(MenuItem.id == data.menu_item_id))
+            menu_item = await db.scalar(
+                select(MenuItem).where(MenuItem.id == data.menu_item_id)
+            )
             if not menu_item:
-                raise HTTPException(
-                    status_code=404, detail="Menu item not found")
+                raise HTTPException(status_code=404, detail="Menu item not found")
 
             existing_basket = await db.scalar(
                 select(Basket).where(
                     and_(
                         Basket.user_id == user_id,
                         Basket.menu_item_id == data.menu_item_id,
-                        Basket.id != basket_id
+                        Basket.id != basket_id,
                     )
                 )
             )
 
             if existing_basket:
                 raise HTTPException(
-                    status_code=409, detail="Item already exists in basket")
+                    status_code=409, detail="Item already exists in basket"
+                )
 
         for key, value in data.dict(exclude_unset=True).items():
             setattr(basket, key, value)
@@ -168,7 +172,9 @@ async def update_basket(db: AsyncSession, basket_id: int, data: BasketUpdateSche
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
-async def update_patch_basket(db: AsyncSession, basket_id: int, quantity: int, user_id: int) -> Basket:
+async def update_patch_basket(
+    db: AsyncSession, basket_id: int, quantity: int, user_id: int
+) -> Basket:
     try:
         basket = await db.scalar(
             select(Basket)
@@ -176,18 +182,17 @@ async def update_patch_basket(db: AsyncSession, basket_id: int, quantity: int, u
             .where(Basket.id == basket_id)
         )
         if not basket:
-            raise HTTPException(
-                status_code=404, detail="Basket item not found")
+            raise HTTPException(status_code=404, detail="Basket item not found")
 
         if basket.user_id != user_id:
             raise HTTPException(status_code=403, detail="Access denied")
 
         if quantity <= 0:
             raise HTTPException(
-                status_code=400, detail="Quantity must be greater than 0")
+                status_code=400, detail="Quantity must be greater than 0"
+            )
         if quantity > 99:
-            raise HTTPException(
-                status_code=400, detail="Quantity cannot exceed 99")
+            raise HTTPException(status_code=400, detail="Quantity cannot exceed 99")
 
         basket.quantity = quantity
         await db.commit()
@@ -207,8 +212,7 @@ async def delete_basket(db: AsyncSession, basket_id: int, user_id: int) -> None:
     try:
         basket = await db.scalar(select(Basket).where(Basket.id == basket_id))
         if not basket:
-            raise HTTPException(
-                status_code=404, detail="Basket item not found")
+            raise HTTPException(status_code=404, detail="Basket item not found")
 
         if basket.user_id != user_id:
             raise HTTPException(status_code=403, detail="Access denied")

@@ -5,7 +5,7 @@ from typing import List
 from fastapi import HTTPException, status
 from models.branch import Branch
 from models.menu import Menu
-from schemas.menu import MenuCreate, MenuUpdate, MenuPatch
+from schemas.menu import MenuCreate, MenuPatch, MenuUpdate
 from sqlalchemy import select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -23,7 +23,7 @@ async def create_menu(db: AsyncSession, data: MenuCreate) -> Menu:
         if not branch:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Branch with ID {data.branch_id} not found"
+                detail=f"Branch with ID {data.branch_id} not found",
             )
 
         menu = Menu(**data.dict(exclude_unset=True))
@@ -46,17 +46,17 @@ async def create_menu(db: AsyncSession, data: MenuCreate) -> Menu:
         if "unique constraint" in error_msg:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Menu with this name already exists for this branch"
+                detail="Menu with this name already exists for this branch",
             )
         elif "foreign key constraint" in error_msg:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Invalid branch reference"
+                detail="Invalid branch reference",
             )
         else:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Error creating menu due to data constraints"
+                detail="Error creating menu due to data constraints",
             )
 
     except Exception as e:
@@ -64,16 +64,14 @@ async def create_menu(db: AsyncSession, data: MenuCreate) -> Menu:
         logger.error(f"Unexpected error creating menu: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Internal server error occurred while creating menu"
+            detail="Internal server error occurred while creating menu",
         )
 
 
 async def get_menu(db: AsyncSession, menu_id: int) -> Menu:
     try:
         query = (
-            select(Menu)
-            .options(selectinload(Menu.branch))
-            .where(Menu.id == menu_id)
+            select(Menu).options(selectinload(Menu.branch)).where(Menu.id == menu_id)
         )
         result = await db.execute(query)
         menu = result.scalar_one_or_none()
@@ -81,7 +79,7 @@ async def get_menu(db: AsyncSession, menu_id: int) -> Menu:
         if not menu:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Menu with ID {menu_id} not found"
+                detail=f"Menu with ID {menu_id} not found",
             )
 
         return menu
@@ -92,7 +90,7 @@ async def get_menu(db: AsyncSession, menu_id: int) -> Menu:
         logger.error(f"Error fetching menu {menu_id}: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error retrieving menu"
+            detail="Error retrieving menu",
         )
 
 
@@ -105,7 +103,7 @@ async def get_menu_by_branch(db: AsyncSession, branch_id: int) -> List[Menu]:
         if not branch:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Branch with ID {branch_id} not found"
+                detail=f"Branch with ID {branch_id} not found",
             )
 
         query = (
@@ -125,11 +123,13 @@ async def get_menu_by_branch(db: AsyncSession, branch_id: int) -> List[Menu]:
         logger.error(f"Error fetching menus for branch {branch_id}: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error retrieving menus"
+            detail="Error retrieving menus",
         )
 
 
-async def get_menus_paginated(db: AsyncSession, skip: int = 0, limit: int = 100) -> List[Menu]:
+async def get_menus_paginated(
+    db: AsyncSession, skip: int = 0, limit: int = 100
+) -> List[Menu]:
     try:
         query = (
             select(Menu)
@@ -147,7 +147,7 @@ async def get_menus_paginated(db: AsyncSession, skip: int = 0, limit: int = 100)
         logger.error(f"Error fetching paginated menus: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error retrieving menus"
+            detail="Error retrieving menus",
         )
 
 
@@ -163,16 +163,13 @@ async def update_menu(db: AsyncSession, menu_id: int, data: MenuUpdate) -> Menu:
             if not branch:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
-                    detail=f"Branch with ID {data.branch_id} not found"
+                    detail=f"Branch with ID {data.branch_id} not found",
                 )
 
         update_data = data.dict(exclude_unset=True)
 
         stmt = (
-            update(Menu)
-            .where(Menu.id == menu_id)
-            .values(**update_data)
-            .returning(Menu)
+            update(Menu).where(Menu.id == menu_id).values(**update_data).returning(Menu)
         )
 
         result = await db.execute(stmt)
@@ -196,17 +193,17 @@ async def update_menu(db: AsyncSession, menu_id: int, data: MenuUpdate) -> Menu:
         if "unique constraint" in error_msg:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Menu with this name already exists for this branch"
+                detail="Menu with this name already exists for this branch",
             )
         elif "foreign key constraint" in error_msg:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Invalid branch reference"
+                detail="Invalid branch reference",
             )
         else:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Error updating menu due to data constraints"
+                detail="Error updating menu due to data constraints",
             )
 
     except Exception as e:
@@ -214,7 +211,7 @@ async def update_menu(db: AsyncSession, menu_id: int, data: MenuUpdate) -> Menu:
         logger.error(f"Error updating menu {menu_id}: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error updating menu"
+            detail="Error updating menu",
         )
 
 
@@ -228,19 +225,15 @@ async def patch_menu(db: AsyncSession, menu_id: int, data: MenuPatch) -> Menu:
             logger.info(f"No fields to update for menu {menu_id}")
             return menu
 
-        if 'branch_id' in update_data:
-            branch_query = select(Branch).where(
-                Branch.id == update_data['branch_id'])
+        if "branch_id" in update_data:
+            branch_query = select(Branch).where(Branch.id == update_data["branch_id"])
             branch_result = await db.execute(branch_query)
             branch = branch_result.scalar_one_or_none()
 
-        update_data['updated_at'] = datetime.utcnow()
+        update_data["updated_at"] = datetime.utcnow()
 
         stmt = (
-            update(Menu)
-            .where(Menu.id == menu_id)
-            .values(**update_data)
-            .returning(Menu)
+            update(Menu).where(Menu.id == menu_id).values(**update_data).returning(Menu)
         )
 
         result = await db.execute(stmt)
@@ -249,7 +242,7 @@ async def patch_menu(db: AsyncSession, menu_id: int, data: MenuPatch) -> Menu:
         if not updated_menu:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Menu with ID {menu_id} not found"
+                detail=f"Menu with ID {menu_id} not found",
             )
 
         await db.commit()
@@ -257,7 +250,8 @@ async def patch_menu(db: AsyncSession, menu_id: int, data: MenuPatch) -> Menu:
         await db.refresh(updated_menu)
 
         logger.info(
-            f"Menu {menu_id} patched successfully. Updated fields: {list(update_data.keys())}")
+            f"Menu {menu_id} patched successfully. Updated fields: {list(update_data.keys())}"
+        )
         return updated_menu
 
     except HTTPException:
@@ -274,46 +268,47 @@ async def patch_menu(db: AsyncSession, menu_id: int, data: MenuPatch) -> Menu:
             if "name" in error_msg:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="A menu with this name already exists for this branch"
+                    detail="A menu with this name already exists for this branch",
                 )
             else:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Duplicate value detected. Please check your input data"
+                    detail="Duplicate value detected. Please check your input data",
                 )
 
         elif "foreign key constraint" in error_msg:
             if "branch_id" in error_msg:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="The specified branch does not exist"
+                    detail="The specified branch does not exist",
                 )
             else:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Invalid reference to related data"
+                    detail="Invalid reference to related data",
                 )
 
         elif "check constraint" in error_msg:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Data validation failed. Please check field values and constraints"
+                detail="Data validation failed. Please check field values and constraints",
             )
 
         else:
             logger.error(f"Unhandled integrity error: {str(e)}")
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Data integrity error. Please check your input and try again"
+                detail="Data integrity error. Please check your input and try again",
             )
 
     except Exception as e:
         await db.rollback()
         logger.error(
-            f"Unexpected error patching menu {menu_id}: {str(e)}", exc_info=True)
+            f"Unexpected error patching menu {menu_id}: {str(e)}", exc_info=True
+        )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="An unexpected error occurred while updating the menu"
+            detail="An unexpected error occurred while updating the menu",
         )
 
 

@@ -118,9 +118,9 @@ services:
     container_name: zxczcx_celery_worker
     restart: always
     command: >
-      celery -A tasks.celery_app worker 
-      --loglevel=INFO 
-      --concurrency=2 
+      celery -A tasks.celery_app worker
+      --loglevel=INFO
+      --concurrency=2
       --max-tasks-per-child=1000
     volumes:
       - ./backend:/app:ro
@@ -160,8 +160,8 @@ services:
     container_name: zxczcx_celery_beat
     restart: always
     command: >
-      celery -A tasks.celery_app beat 
-      --loglevel=INFO 
+      celery -A tasks.celery_app beat
+      --loglevel=INFO
       --schedule=/tmp/celerybeat-schedule
     volumes:
       - ./backend:/app:ro

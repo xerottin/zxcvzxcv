@@ -1,14 +1,13 @@
 import logging
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Depends, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import text
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from api import router as api_router
 from core.settings import settings
 from db.session import get_pg_db
+from fastapi import Depends, FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -34,7 +33,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # settings.ALLOWED_HOSTS,
-    allow_credentials=True,  # False 
+    allow_credentials=True,  # False
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
     allow_headers=["*"],
 )
@@ -57,9 +56,10 @@ async def health_check(db: AsyncSession = Depends(get_pg_db)):
             "status": "healthy",
             "database": "connected",
             "version": app.version,
-            "environment": "production" if not settings.DEBUG else "development"
+            "environment": "production" if not settings.DEBUG else "development",
         }
     except Exception as e:
         logger.error(f"Health check failed: {e}")
         raise HTTPException(
-            503, {"detail": "Service unavailable", "database": "disconnected"})
+            503, {"detail": "Service unavailable", "database": "disconnected"}
+        )

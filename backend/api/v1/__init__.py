@@ -1,9 +1,11 @@
-from api.v1 import user, company, branch, menu, menu_item, basket, order, authorization
+from api.v1 import authorization, basket, branch, company, menu, menu_item, order, user
 from fastapi import APIRouter
 
 router_v1 = APIRouter(prefix="/v1")
 
-router_v1.include_router(authorization.router, prefix="/authorization", tags=["Authorization"])
+router_v1.include_router(
+    authorization.router, prefix="/authorization", tags=["Authorization"]
+)
 router_v1.include_router(user.router, prefix="/users", tags=["Users"])
 router_v1.include_router(company.router, prefix="/companies", tags=["Companies"])
 router_v1.include_router(branch.router, prefix="/branches", tags=["Branches"])

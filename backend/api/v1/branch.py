@@ -1,9 +1,14 @@
-from crud.branch import create_branch, update_owner_role_branch, get_branch, delete_branch
+from crud.branch import (
+    create_branch,
+    delete_branch,
+    get_branch,
+    update_owner_role_branch,
+)
 from db.session import get_pg_db
 from dependencies.auth import get_current_user, require_admin_or_company
-from fastapi import APIRouter, status, Depends
+from fastapi import APIRouter, Depends, status
 from models import User
-from schemas.branch import BranchInDb, BranchCreate
+from schemas.branch import BranchCreate, BranchInDb
 from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="", tags=["Branches"])
@@ -11,9 +16,9 @@ router = APIRouter(prefix="", tags=["Branches"])
 
 @router.post("/", response_model=BranchInDb, status_code=status.HTTP_201_CREATED)
 async def create_branch_endpoint(
-        data: BranchCreate,
-        db: AsyncSession = Depends(get_pg_db),
-        current_user: User = Depends(require_admin_or_company)
+    data: BranchCreate,
+    db: AsyncSession = Depends(get_pg_db),
+    current_user: User = Depends(require_admin_or_company),
 ):
     #     branch = await create_branch(db, data)
     #     return BranchInDb.from_orm(branch)
@@ -22,27 +27,27 @@ async def create_branch_endpoint(
 
 @router.patch("/{branch_id}", response_model=BranchInDb, status_code=status.HTTP_200_OK)
 async def add_owner_branch(
-        branch_id: int,
-        owner_id: int,
-        current_user: User = Depends(require_admin_or_company),
-        db: AsyncSession = Depends(get_pg_db)
+    branch_id: int,
+    owner_id: int,
+    current_user: User = Depends(require_admin_or_company),
+    db: AsyncSession = Depends(get_pg_db),
 ):
     return await update_owner_role_branch(branch_id, owner_id, db)
 
 
 @router.get("/{branch_id}", response_model=BranchInDb)
 async def get_branch_endpoint(
-        branch_id: int,
-        current_user: User = Depends(get_current_user),
-        db: AsyncSession = Depends(get_pg_db)
+    branch_id: int,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_pg_db),
 ):
     return await get_branch(branch_id, db)
 
 
 @router.delete("/{branch_id}")
 async def delete_branch_endpoint(
-        branch_id: int,
-        current_user: User = Depends(require_admin_or_company),
-        db: AsyncSession = Depends(get_pg_db)
+    branch_id: int,
+    current_user: User = Depends(require_admin_or_company),
+    db: AsyncSession = Depends(get_pg_db),
 ):
     return await delete_branch(branch_id, db)

@@ -10,30 +10,33 @@ from sqlalchemy.ext.asyncio import AsyncSession
 logger = logging.getLogger(__name__)
 
 
-async def _cleanup_unverified_users_api(db: AsyncSession, payload: CleanupRequest) -> dict:
+async def _cleanup_unverified_users_api(
+    db: AsyncSession, payload: CleanupRequest
+) -> dict:
     deleted_count = 0
     processed_users = []
 
     try:
-        cutoff_date = datetime.now(timezone.utc) - \
-            timedelta(days=payload.days_threshold)
+        cutoff_date = datetime.now(timezone.utc) - timedelta(
+            days=payload.days_threshold
+        )
 
         logger.info(
-            f"Starting cleanup of users created before {cutoff_date} (dry_run: {payload.dry_run})")
+            f"Starting cleanup of users created before {cutoff_date} (dry_run: {payload.dry_run})"
+        )
 
         stmt = select(User).where(
             and_(
                 User.is_verified == False,
                 User.created_at < cutoff_date,
-                User.is_active == True
+                User.is_active == True,
             )
         )
 
         result = await db.execute(stmt)
         users_to_delete = result.scalars().all()
 
-        logger.info(
-            f"Found {len(users_to_delete)} unverified users to process")
+        logger.info(f"Found {len(users_to_delete)} unverified users to process")
 
         for user in users_to_delete:
             user_info = {
@@ -42,18 +45,17 @@ async def _cleanup_unverified_users_api(db: AsyncSession, payload: CleanupReques
                 "email": user.email,
                 "phone": user.phone,
                 "created_at": user.created_at.isoformat(),
-                "days_old": (datetime.now(timezone.utc) - user.created_at).days
+                "days_old": (datetime.now(timezone.utc) - user.created_at).days,
             }
             processed_users.append(user_info)
 
             if not payload.dry_run:
-                logger.info(
-                    f"Deleting unverified user: {user.id}, email: {user.email}")
+                logger.info(f"Deleting unverified user: {user.id}, email: {user.email}")
 
                 codes_stmt = delete(VerificationCode).where(
                     or_(
                         VerificationCode.email == user.email,
-                        VerificationCode.phone == user.phone
+                        VerificationCode.phone == user.phone,
                     )
                 )
                 await db.execute(codes_stmt)
@@ -69,7 +71,7 @@ async def _cleanup_unverified_users_api(db: AsyncSession, payload: CleanupReques
         return {
             "deleted_users": deleted_count,
             "deleted_codes": 0,
-            "processed_users": processed_users
+            "processed_users": processed_users,
         }
 
     except Exception as e:
@@ -100,7 +102,7 @@ async def _cleanup_expired_codes_api(db: AsyncSession, payload: CleanupRequest) 
         return {
             "deleted_users": 0,
             "deleted_codes": deleted_count,
-            "processed_users": []
+            "processed_users": [],
         }
 
     except Exception as e:
