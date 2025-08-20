@@ -6,7 +6,7 @@ celery_app = Celery(
     "auth_service",
     broker=settings.CELERY_BROKER_URL,
     backend=settings.CELERY_RESULT_BACKEND,
-    include=["tasks.cleanup_tasks"]
+    include=["tasks.cleanup_tasks"],
 )
 
 celery_app.conf.update(
@@ -21,7 +21,6 @@ celery_app.conf.update(
     task_soft_time_limit=25 * 60,  # 25 minutes
     worker_prefetch_multiplier=1,
     worker_max_tasks_per_child=1000,
-
     beat_schedule={
         # Weekly comprehensive cleanup (Every Monday at 2:00 AM UTC)
         "weekly-comprehensive-cleanup": {
@@ -29,19 +28,17 @@ celery_app.conf.update(
             # "schedule": crontab(hour=2, minute=0, day_of_week=1),  # Production schedule
             "schedule": 300.0,  # For testing: every 2 minutes
         },
-
         # Daily unverified users cleanup (Every day at 3:00 AM UTC)
         "daily-unverified-users-cleanup": {
             "task": "tasks.cleanup_tasks.cleanup_unverified_users",
             # "schedule": crontab(hour=3, minute=0),  # Production schedule
             "schedule": 300.0,  # For testing: every minute
         },
-
         # Frequent expired codes cleanup (Every 30 minutes)
         "cleanup-expired-verification-codes": {
             "task": "tasks.cleanup_tasks.cleanup_expired_codes",
             "schedule": crontab(minute="*/6"),  # Every 30 minutes
-        }
+        },
     },
     beat_schedule_filename="celerybeat-schedule",
 )

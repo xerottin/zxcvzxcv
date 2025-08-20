@@ -14,9 +14,7 @@ class BranchBase(BaseModel):
     company_id: int | None = None
     owner_id: int | None = None
 
-    model_config = {
-        "from_attributes": True
-    }
+    model_config = {"from_attributes": True}
 
 
 class BranchCreate(BranchBase):

@@ -1,6 +1,6 @@
 from models import BaseModel
-from sqlalchemy import String, Float, Integer, ForeignKey
-from sqlalchemy.orm import relationship, Mapped, mapped_column
+from sqlalchemy import Float, ForeignKey, Integer, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
 class Branch(BaseModel):
@@ -12,8 +12,8 @@ class Branch(BaseModel):
     latitude: Mapped[float] = mapped_column(Float)
     longitude: Mapped[float] = mapped_column(Float)
     rating: Mapped[float] = mapped_column(Float)
-    company_id: Mapped[int] = mapped_column(Integer, ForeignKey('company.id'))
-    owner_id: Mapped[int] = mapped_column(Integer, ForeignKey('user.id'))
+    company_id: Mapped[int] = mapped_column(Integer, ForeignKey("company.id"))
+    owner_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"))
 
     company: Mapped["Company"] = relationship("Company", back_populates="branch")
     owner: Mapped["User"] = relationship("User", back_populates="branch", uselist=False)

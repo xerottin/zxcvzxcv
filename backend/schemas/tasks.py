@@ -17,13 +17,13 @@ class CleanupRequest(BaseModel):
     dry_run: bool = False
     force: bool = False
 
-    @field_validator('days_threshold')
+    @field_validator("days_threshold")
     @classmethod
     def validate_days_threshold(cls, v: int) -> int:
         if v < 1:
-            raise ValueError('Days threshold must be at least 1')
+            raise ValueError("Days threshold must be at least 1")
         if v > 365:
-            raise ValueError('Days threshold cannot exceed 365 days')
+            raise ValueError("Days threshold cannot exceed 365 days")
         return v
 
 
