@@ -12,18 +12,16 @@ from services.cleanup_service import _cleanup_expired_codes_api, _cleanup_unveri
 from sqlalchemy import select, and_, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from tasks import celery_app
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
 @router.get("/stats", response_model=CleanupStats)
-@timeit
 async def get_cleanup_stats(
         days_threshold: int = 7,
         db: AsyncSession = Depends(get_pg_db),
-        current_user: User = Depends(require_admin)
+        # current_user: User = Depends(require_admin)
 ):
     try:
         cutoff_date = datetime.now(timezone.utc) - timedelta(days=days_threshold)
@@ -83,12 +81,12 @@ async def get_cleanup_stats(
         raise HTTPException(status_code=500, detail="Failed to get cleanup statistics")
 
 
-@router.post("/execute", response_model=CleanupResponse)
-@timeit
+@router.post("/execute", response_model=CleanupResponse, include_in_schema=True)
 async def execute_cleanup(
         payload: CleanupRequest,
         db: AsyncSession = Depends(get_pg_db),
-        current_user: User = Depends(require_admin)
+        
+        # current_user: User = Depends(require_admin)
 ):
     start_time = datetime.now(timezone.utc)
 
@@ -115,7 +113,7 @@ async def execute_cleanup(
         message = f"{action} {result['deleted_users']} users and {result['deleted_codes']} codes"
 
         logger.info(
-            f"Cleanup executed by admin {current_user.username}: "
+            # f"Cleanup executed by admin {current_user.username}: "
             f"{message} in {execution_time:.2f}s"
         )
 
