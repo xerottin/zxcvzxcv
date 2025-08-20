@@ -1,18 +1,17 @@
-import os
-import sys
-import importlib
-import pkgutil
-import pytest_asyncio
 import contextlib
+import importlib
+import os
+import pkgutil
+import sys
+
 import httpx
+import pytest_asyncio
+from db.base import Base
+from dependencies.auth import require_admin
+from httpx import ASGITransport
+from sqlalchemy import event
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.pool import NullPool
-from sqlalchemy import event
-
-from dependencies.auth import require_admin
-from db.base import Base
-from httpx import ASGITransport
-
 
 BACKEND_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if BACKEND_DIR not in sys.path:
@@ -88,14 +87,17 @@ async def client(db_session: AsyncSession):
         yield db_session
 
     from main import app, get_pg_db
+
     app.dependency_overrides[get_pg_db] = _override_get_pg_db
 
     if require_admin is not None:
+
         class _DummyAdmin:
             id = 1
             username = "admin"
             role = "admin"
             is_active = True
+
         app.dependency_overrides[require_admin] = lambda: _DummyAdmin()
 
     transport = ASGITransport(app=app)

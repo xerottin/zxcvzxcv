@@ -20,19 +20,14 @@ def cleanup_via_api(self, cleanup_type="unverified_users", days_threshold=7, dry
         #     "Content-Type": "application/json"
         # }
 
-        payload = {
-            "cleanup_type": cleanup_type,
-            "days_threshold": days_threshold,
-            "dry_run": dry_run,
-            "force": force
-        }
+        payload = {"cleanup_type": cleanup_type, "days_threshold": days_threshold, "dry_run": dry_run, "force": force}
 
         with httpx.Client() as client:
             response = client.post(
                 f"{settings.API_BASE_URL}/api/tasks/execute",
                 json=payload,
                 # headers=headers,
-                timeout=60  # 1 minute timeout
+                timeout=60,  # 1 minute timeout
             )
 
             if response.status_code == 200:
@@ -46,34 +41,19 @@ def cleanup_via_api(self, cleanup_type="unverified_users", days_threshold=7, dry
 
     except Exception as exc:
         logger.error(f"Cleanup via API failed: {exc}", exc_info=True)
-        raise self.retry(exc=exc, countdown=60 * (2 ** self.request.retries))
+        raise self.retry(exc=exc, countdown=60 * (2**self.request.retries))
 
 
 @current_app.task(bind=True, max_retries=3)
 def cleanup_unverified_users(self):
-    return cleanup_via_api(
-        cleanup_type="unverified_users",
-        days_threshold=7,
-        dry_run=False,
-        force=False
-    )
+    return cleanup_via_api(cleanup_type="unverified_users", days_threshold=7, dry_run=False, force=False)
 
 
 @current_app.task(bind=True, max_retries=3)
 def weekly_comprehensive_cleanup(self):
-    return cleanup_via_api(
-        cleanup_type="all",
-        days_threshold=30,
-        dry_run=False,
-        force=True
-    )
+    return cleanup_via_api(cleanup_type="all", days_threshold=30, dry_run=False, force=True)
 
 
 @current_app.task(bind=True, max_retries=3)
 def cleanup_expired_codes(self):
-    return cleanup_via_api(
-        cleanup_type="expired_codes",
-        days_threshold=30,
-        dry_run=False,
-        force=False
-    )
+    return cleanup_via_api(cleanup_type="expired_codes", days_threshold=30, dry_run=False, force=False)

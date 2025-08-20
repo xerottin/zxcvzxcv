@@ -23,13 +23,9 @@ class Settings(BaseSettings):
     ALLOWED_HOSTS: List[str] = Field(default_factory=lambda: ["http://localhost:3000"])
     API_BASE_URL: str = Field("http://127.0.0.1:8001", description="Base URL for the API")
 
-    model_config = {
-        "env_file": ".env",
-        "case_sensitive": True,
-        "extra": "ignore"
-    }
+    model_config = {"env_file": ".env", "case_sensitive": True, "extra": "ignore"}
 
-    @field_validator('SECRET_KEY')
+    @field_validator("SECRET_KEY")
     @classmethod
     def secret_key_strength(cls, v: str) -> str:
         if len(v) < 2:
@@ -38,7 +34,7 @@ class Settings(BaseSettings):
             raise ValueError("Please use a strong, unique SECRET_KEY")
         return v
 
-    @field_validator('ALLOWED_HOSTS')
+    @field_validator("ALLOWED_HOSTS")
     @classmethod
     def validate_hosts(cls, v: List[str]) -> List[str]:
         if not v:
@@ -48,14 +44,10 @@ class Settings(BaseSettings):
                 raise ValueError("Wildcard origins should be avoided")
         return v
 
-    @field_validator('ASYNC_DATABASE_URL')
+    @field_validator("ASYNC_DATABASE_URL")
     @classmethod
     def validate_database_url(cls, v: str) -> str:
-        valid_prefixes = (
-            'postgresql+asyncpg://',
-            'sqlite+aiosqlite://',
-            'mysql+aiomysql://'
-        )
+        valid_prefixes = ("postgresql+asyncpg://", "sqlite+aiosqlite://", "mysql+aiomysql://")
         if not v.startswith(valid_prefixes):
             raise ValueError(f"Invalid async database URL format. Must start with: {valid_prefixes}")
         return v

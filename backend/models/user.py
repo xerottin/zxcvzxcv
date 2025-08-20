@@ -2,9 +2,9 @@ import enum
 from typing import List
 
 from models import BaseModel
+from sqlalchemy import Boolean, String
 from sqlalchemy import Enum as SAEnum
-from sqlalchemy import String, Boolean
-from sqlalchemy.orm import relationship, Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
 class UserRole(enum.Enum):
@@ -15,17 +15,14 @@ class UserRole(enum.Enum):
 
 
 class User(BaseModel):
-    __tablename__ = 'user'
+    __tablename__ = "user"
 
     username: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     phone: Mapped[str] = mapped_column(String(255), nullable=True)
     is_verified: Mapped[bool] = mapped_column(Boolean, default=False)
-    role: Mapped[UserRole] = mapped_column(
-        SAEnum(UserRole, name="user_role", create_type=True),
-        nullable=False
-    )
+    role: Mapped[UserRole] = mapped_column(SAEnum(UserRole, name="user_role", create_type=True), nullable=False)
 
     branch: Mapped[List["Branch"]] = relationship("Branch", back_populates="owner", uselist=False)
     company: Mapped["Company"] = relationship("Company", back_populates="owner", uselist=False)

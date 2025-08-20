@@ -1,4 +1,4 @@
-from api.v1 import user, company, branch, menu, menu_item, basket, order, authorization
+from api.v1 import authorization, basket, branch, company, menu, menu_item, order, user
 from fastapi import APIRouter
 
 router_v1 = APIRouter(prefix="/v1")

@@ -19,9 +19,7 @@ class MenuInDB(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-    model_config = {
-        "from_attributes": True
-    }
+    model_config = {"from_attributes": True}
 
 
 class MenuResponse(BaseModel):
@@ -33,9 +31,7 @@ class MenuResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-    model_config = {
-        "from_attributes": True
-    }
+    model_config = {"from_attributes": True}
 
 
 class MenuUpdate(BaseModel):
@@ -51,6 +47,4 @@ class MenuPatch(BaseModel):
     description: str | None = None
     branch_id: int | None = None
 
-    model_config = {
-        "from_attributes": True
-    }
+    model_config = {"from_attributes": True}

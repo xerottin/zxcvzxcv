@@ -1,0 +1,14 @@
+line-length = 120
+
+extend-exclude = ["backend/alembic/versions"]
+
+[lint]
+select = ["I"]
+
+[lint.flake8-bugbear]
+extend-immutable-calls = [
+  "fastapi.Depends",
+  "fastapi.Query",
+  "fastapi.Security",
+  "fastapi.File",
+]
