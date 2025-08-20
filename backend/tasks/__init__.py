@@ -1,2 +1,1 @@
-
-__all__ = ["cleanup_unverified_users"]
+__all__ = ["celerybeat-schedule"]

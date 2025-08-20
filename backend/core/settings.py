@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     SYNC_DATABASE_URL: str = Field(..., description="Sync database URL")
 
     # Celery
-    CELERY_BROKER_URL: str = "amqp://guest:guest@rabbitmq:5672//"
+    CELERY_BROKER_URL: str = "amqp://xerottin:1111@localhost:5672//"
     CELERY_RESULT_BACKEND: str = "rpc://"
 
     # Security
@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     # CORS & Debug
     DEBUG: bool = False
     ALLOWED_HOSTS: List[str] = Field(default_factory=lambda: ["http://localhost:3000"])
-    API_BASE_URL: str = Field("http://localhost:8000", description="Base URL for the API")
+    API_BASE_URL: str = Field("http://127.0.0.1:8001", description="Base URL for the API")
 
     model_config = {
         "env_file": ".env",

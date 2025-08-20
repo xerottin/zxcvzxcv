@@ -1,6 +1,6 @@
 from crud.branch import create_branch, update_owner_role_branch, get_branch, delete_branch
 from db.session import get_pg_db
-from auth import get_current_user, require_admin_or_company
+from dependencies.auth import get_current_user, require_admin_or_company
 from fastapi import APIRouter, status, Depends
 from models import User
 from schemas.branch import BranchInDb, BranchCreate

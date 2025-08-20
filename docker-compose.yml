@@ -12,10 +12,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      # mongo:
-      #   condition: service_healthy
-      # redis:
-      #   condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     command: bash -c "alembic upgrade head && gunicorn -b 0.0.0.0:8000  -w 1 -t 120 -k uvicorn.workers.UvicornWorker main:app --max-requests 1000 --max-requests-jitter 100 --access-logfile -"
     #use websocket for future websocket support
     networks:
@@ -25,118 +23,181 @@ services:
         limits:
           cpus: "0.50"
           memory: 512M
+        reservations:
+          cpus: "0.25"
+          memory: 256M
     logging:
       driver: json-file
       options:
         max-size: "10m"
         max-file: "3"
-
-  # websocket:
-  #   container_name: zxczcx_websocket
-  #   build:
-  #     context: ./websocket
-  #     dockerfile: Dockerfile
-  #   restart: always
-  #   env_file:
-  #     - ./backend/.env
-  #   ports:
-  #     - "9000:9000"
-  #   networks:
-  #     - zxczcx_network
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         cpus: "0.25"
-  #         memory: 256M
-  #   logging:
-  #     driver: json-file
-  #     options:
-  #       max-size: "5m"
-  #       max-file: "2"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   postgres:
     image: postgres:16
     container_name: zxczcx_postgres_db
-    restart: always
+    restart: unless-stopped
     env_file:
       - ./backend/.env
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-zxczcx}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     networks:
       - zxczcx_network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-zxczcx}"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 30s
     deploy:
       resources:
         limits:
           cpus: "0.50"
           memory: 512M
+        reservations:
+          cpus: "0.25"
+          memory: 256M
     logging:
       driver: json-file
       options:
         max-size: "10m"
         max-file: "3"
 
+  rabbitmq:
+    image: rabbitmq:4.0
+    container_name: zxczcx_rabbitmq
+    restart: unless-stopped
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER:-admin}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASS:-admin}
+      - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbit log_levels [{connection,none},{channel,info},{default,error}] disk_free_limit 2147483648
 
-  # mongo:
-  #   image: mongo:7
-  #   container_name: zxczcx_mongo_db
-  #   restart: always
-  #   volumes:
-  #     - mongo_data:/data/db
-  #   ports:
-  #     - "27017:27017"
-  #   networks:
-  #     - zxczcx_network
-  #   healthcheck:
-  #     test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-  #     interval: 10s
-  #     timeout: 5s
-  #     retries: 5
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         cpus: "0.50"
-  #         memory: 512M
-  #   logging:
-  #     driver: json-file
-  #     options:
-  #       max-size: "10m"
-  #       max-file: "3"
+    ports:
+      - "${RABBITMQ_PORT:-5672}:5672"
+      - "${RABBITMQ_MGMT_PORT:-15672}:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - zxczcx_network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 512M
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
 
-  # redis:
-  #   image: redis:7
-  #   container_name: zxczcx_redis_cache
-  #   restart: always
-  #   ports:
-  #     - "6379:6379"
-  #   networks:
-  #     - zxczcx_network
-  #   healthcheck:
-  #     test: ["CMD", "redis-cli", "ping"]
-  #     interval: 10s
-  #     timeout: 5s
-  #     retries: 5
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         cpus: "0.25"
-  #         memory: 256M
-  #   logging:
-  #     driver: json-file
-  #     options:
-  #       max-size: "5m"
-  #       max-file: "2"
+  celery_worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: zxczcx_celery_worker
+    restart: always
+    command: >
+      celery -A tasks.celery_app worker 
+      --loglevel=INFO 
+      --concurrency=2 
+      --max-tasks-per-child=1000
+    volumes:
+      - ./backend:/app:ro
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - zxczcx_network
+    environment:
+      - CELERY_BROKER_URL=amqp://${RABBITMQ_USER:-admin}:${RABBITMQ_PASS:-admin}@zxczcx_rabbitmq:5672//
+    env_file:
+      - ./backend/.env
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 512M
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "celery", "-A", "tasks.celery_app", "inspect", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  celery_beat:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: zxczcx_celery_beat
+    restart: always
+    command: >
+      celery -A tasks.celery_app beat 
+      --loglevel=INFO 
+      --schedule=/tmp/celerybeat-schedule
+    volumes:
+      - ./backend:/app:ro
+      - celery_beat_data:/tmp
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - zxczcx_network
+    environment:
+      - CELERY_BROKER_URL=amqp://${RABBITMQ_USER:-admin}:${RABBITMQ_PASS:-admin}@zxczcx_rabbitmq:5672//
+    env_file:
+      - ./backend/.env
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 256M
+        reservations:
+          cpus: "0.10"
+          memory: 128M
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "2"
+
 
 volumes:
   postgres_data:
-  # mongo_data:
-  # redis_data:
+    driver: local
+  rabbitmq_data:
+    driver: local
+  celery_beat_data:
+    driver: local
+
 
 networks:
   zxczcx_network:
