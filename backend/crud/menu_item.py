@@ -227,7 +227,8 @@ async def delete_menu_item(
         raise
     except Exception as e:
         await db.rollback()
-        logger.error(f"Error deleting menu item {menu_item_id}: {e}", exc_info=True)
+        logger.error(
+            f"Error deleting menu item {menu_item_id}: {e}", exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal server error occurred while deleting menu item"

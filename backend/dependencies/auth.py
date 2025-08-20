@@ -51,6 +51,7 @@ async def get_current_user(
 
     return user
 
+
 async def require_admin(current_user: User = Depends(get_current_user)):
     if current_user.role != UserRole.admin:
         raise HTTPException(status_code=403, detail="Admin access required")
@@ -59,14 +60,17 @@ async def require_admin(current_user: User = Depends(get_current_user)):
 
 async def require_admin_or_company(current_user: User = Depends(get_current_user)):
     if current_user.role not in [UserRole.admin, UserRole.company]:
-        raise HTTPException(status_code=403, detail="Admin or Company access required")
+        raise HTTPException(
+            status_code=403, detail="Admin or Company access required")
     return current_user
 
 
 async def require_company_or_branch(current_user: User = Depends(get_current_user)):
     if current_user.role not in [UserRole.company, UserRole.branch]:
-        raise HTTPException(status_code=403, detail="Company or Branch access required")
+        raise HTTPException(
+            status_code=403, detail="Company or Branch access required")
     return current_user
+
 
 async def require_branch(current_user: User = Depends(get_current_user)):
     if current_user.role != UserRole.branch:
@@ -82,5 +86,6 @@ def check_assign_permission(
         raise HTTPException(status_code=401, detail="Authentication required")
     allowed = ASSIGN_RULES.get(current.role, set())
     if target_role not in allowed:
-        raise HTTPException(status_code=403, detail="You cannot assign this role")
+        raise HTTPException(
+            status_code=403, detail="You cannot assign this role")
     return current

@@ -7,6 +7,7 @@ from models.user import User
 
 pytestmark = pytest.mark.asyncio
 
+
 async def test_create_user_persists_to_db(db_session):
     payload = UserCreate(
         username=None,
@@ -23,11 +24,14 @@ async def test_create_user_persists_to_db(db_session):
     saved = q.scalar_one()
     assert saved.email == "alice@example.com"
 
+
 async def test_create_user_duplicate_email_409(db_session):
-    p1 = UserCreate(username="u1", email="dup@example.com", password="xx", role="user")
+    p1 = UserCreate(username="u1", email="dup@example.com",
+                    password="xx", role="user")
     await create_user(db_session, p1)
 
-    p2 = UserCreate(username="u2", email="dup@example.com", password="xy", role="user")
+    p2 = UserCreate(username="u2", email="dup@example.com",
+                    password="xy", role="user")
 
     from fastapi import HTTPException
     with pytest.raises(HTTPException) as exc:

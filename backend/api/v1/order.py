@@ -24,9 +24,11 @@ async def create_order_endpoint(
 @router.get("/", response_model=OrdersResponse)
 async def get_orders_endpoint(
         user_id: Optional[int] = Query(None, description="Filter by user ID"),
-        branch_id: Optional[int] = Query(None, description="Filter by branch ID"),
+        branch_id: Optional[int] = Query(
+            None, description="Filter by branch ID"),
         skip: int = Query(0, ge=0, description="Number of orders to skip"),
-        limit: int = Query(100, ge=1, le=1000, description="Number of orders to return"),
+        limit: int = Query(100, ge=1, le=1000,
+                           description="Number of orders to return"),
         db: AsyncSession = Depends(get_pg_db),
         current_user: User = Depends(get_current_user)
 ):

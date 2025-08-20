@@ -61,4 +61,5 @@ async def health_check(db: AsyncSession = Depends(get_pg_db)):
         }
     except Exception as e:
         logger.error(f"Health check failed: {e}")
-        raise HTTPException(503, {"detail": "Service unavailable", "database": "disconnected"})
+        raise HTTPException(
+            503, {"detail": "Service unavailable", "database": "disconnected"})

@@ -32,7 +32,8 @@ async def list_baskets(
         db: AsyncSession = Depends(get_pg_db),
         current_user: User = Depends(get_current_user),
         skip: int = Query(0, ge=0, description="Number of records to skip"),
-        limit: int = Query(100, ge=1, le=1000, description="Number of records to return")
+        limit: int = Query(100, ge=1, le=1000,
+                           description="Number of records to return")
 ):
     return await get_baskets(db, current_user.id, skip, limit)
 
